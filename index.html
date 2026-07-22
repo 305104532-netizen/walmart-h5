@@ -8,7 +8,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 :root { --primary: #1A56DB; --primary-light: #E1EFFE; --bg: #F3F4F6; --white: #FFFFFF; --text: #1F2937; --text-sec: #6B7280; --text-third: #9CA3AF; --border: #E5E7EB; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; }
 html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); font-size:14px; -webkit-font-smoothing: antialiased; }
-.app-container { max-width:375px; margin:0 auto; height:100vh; position:relative; overflow:hidden; background:var(--bg); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+.app-container { width:100%; max-width:100%; margin:0 auto; height:100vh; position:relative; overflow:hidden; background:var(--bg); }
 .page { display:none; height:100%; overflow-y:auto; padding-bottom:60px; }
 .page.active { display:block; }
 .page.sub-page { padding-bottom:0; }
@@ -181,7 +181,7 @@ html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe
 
 .sf-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:400; display:none; align-items:flex-end; justify-content:center; }
 .sf-overlay.show { display:flex; }
-.sf-sheet { width:100%; max-width:375px; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px; max-height:75vh; display:flex; flex-direction:column; animation:slideUp .3s ease; }
+.sf-sheet { width:100%; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px; max-height:75vh; display:flex; flex-direction:column; animation:slideUp .3s ease; }
 @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
 .sf-sheet__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
 .sf-sheet__title { font-size:16px; font-weight:600; }
@@ -396,7 +396,7 @@ html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe
 /* Activity Registration Flow */
 .reg-modal { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; align-items:center; justify-content:center; }
 .reg-modal.show { display:flex; }
-.reg-modal__box { width:90%; max-width:340px; background:#fff; border-radius:16px; padding:24px 20px; text-align:center; animation:slideUp .3s ease; }
+.reg-modal__box { width:90%; max-width:340px; background:#fff; border-radius:16px; padding:24px 20px; text-align:center; position:relative; }
 .reg-modal__title { font-size:16px; font-weight:600; margin-bottom:8px; }
 .reg-modal__desc { font-size:12px; color:var(--text-sec); margin-bottom:16px; line-height:1.5; }
 .reg-modal__qr { width:160px; height:160px; margin:0 auto 16px; background:#F8FAFC; border:2px dashed var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; }
@@ -418,7 +418,7 @@ html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe
 /* Share Sheet */
 .share-sheet { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; align-items:flex-end; justify-content:center; }
 .share-sheet.show { display:flex; }
-.share-sheet__box { width:100%; max-width:375px; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px calc(20px + env(safe-area-inset-bottom)); }
+.share-sheet__box { width:100%; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px calc(20px + env(safe-area-inset-bottom)); }
 .share-sheet__title { font-size:14px; font-weight:600; text-align:center; margin-bottom:16px; }
 .share-sheet__grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .share-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
@@ -487,7 +487,7 @@ html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe
 .reg-status__desc { font-size:12px; color:var(--text-sec); }
 .share-sheet { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; align-items:flex-end; justify-content:center; }
 .share-sheet.show { display:flex; }
-.share-sheet__box { width:100%; max-width:375px; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px; }
+.share-sheet__box { width:100%; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px; }
 .share-sheet__title { font-size:14px; font-weight:600; text-align:center; margin-bottom:16px; }
 .share-sheet__grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .share-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
