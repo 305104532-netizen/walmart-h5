@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>沃尔玛卖家中心</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --primary: #1A56DB; --primary-light: #E1EFFE; --bg: #F3F4F6; --white: #FFFFFF; --text: #1F2937; --text-sec: #6B7280; --text-third: #9CA3AF; --border: #E5E7EB; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; }
+html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); font-size:14px; -webkit-font-smoothing: antialiased; }
+.app-container { max-width:375px; margin:0 auto; height:100vh; position:relative; overflow:hidden; background:var(--bg); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+.page { display:none; height:100%; overflow-y:auto; padding-bottom:60px; }
+.page.active { display:block; }
+.page.sub-page { padding-bottom:0; }
+
+/* Nav Bar */
+.nav-bar { height:44px; background:var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; font-weight:600; position:sticky; top:0; z-index:100; padding:0 12px; }
+.nav-bar .back-btn { position:absolute; left:12px; font-size:20px; cursor:pointer; padding:4px 8px; }
+.nav-bar-white { background:#fff; color:var(--text); border-bottom:1px solid var(--border); }
+
+/* TabBar */
+.tab-bar { position:absolute; bottom:0; left:0; right:0; height:56px; background:#fff; display:flex; border-top:1px solid var(--border); z-index:200; }
+.tab-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; font-size:10px; color:var(--text-sec); transition:color .2s; }
+.tab-item.active { color:var(--primary); }
+.tab-item .tab-icon { width:24px; height:24px; margin-bottom:2px; display:flex; align-items:center; justify-content:center; }
+.tab-item .tab-icon svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+
+/* Banner */
+.banner-wrap { position:relative; width:100%; height:160px; overflow:hidden; }
+.banner-track { display:flex; transition:transform .5s ease; height:100%; }
+.banner-slide { min-width:100%; height:100%; }
+.banner-slide img { width:100%; height:100%; object-fit:cover; }
+.banner-dots { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:6px; }
+.banner-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.5); transition:all .3s; }
+.banner-dot.active { background:#fff; width:16px; border-radius:3px; }
+
+/* Status Card */
+.status-card { margin:12px; padding:16px; background:#fff; border-radius:12px; display:flex; align-items:center; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.status-card__icon { width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, #EEF2FF, #E0E7FF); display:flex; align-items:center; justify-content:center; margin-right:12px; flex-shrink:0; }
+.status-card__icon svg { width:22px; height:22px; stroke:#4F46E5; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.status-card__info { flex:1; }
+.status-card__title { font-size:15px; font-weight:600; display:block; }
+.status-card__desc { font-size:12px; color:var(--text-sec); margin-top:2px; display:block; }
+.status-card__arrow { font-size:20px; color:var(--text-third); }
+
+/* Quick Entries (八大金刚) */
+.quick-entries { display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:12px 12px 16px; background:#fff; margin:0 12px; border-radius:12px; }
+.quick-entry { display:flex; flex-direction:column; align-items:center; padding:10px 0; cursor:pointer; }
+.quick-entry__icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:6px; }
+.quick-entry__icon svg { width:22px; height:22px; }
+.quick-entry__icon.icon-blue { background:linear-gradient(135deg, #EEF2FF, #E0E7FF); }
+.quick-entry__icon.icon-blue svg { stroke:#4F46E5; }
+.quick-entry__icon.icon-violet { background:linear-gradient(135deg, #F5F3FF, #EDE9FE); }
+.quick-entry__icon.icon-violet svg { stroke:#7C3AED; }
+.quick-entry__icon.icon-amber { background:linear-gradient(135deg, #FFFBEB, #FEF3C7); }
+.quick-entry__icon.icon-amber svg { stroke:#D97706; }
+.quick-entry__icon.icon-teal { background:linear-gradient(135deg, #F0FDFA, #CCFBF1); }
+.quick-entry__icon.icon-teal svg { stroke:#0D9488; }
+.quick-entry__icon.icon-rose { background:linear-gradient(135deg, #FFF1F2, #FFE4E6); }
+.quick-entry__icon.icon-rose svg { stroke:#E11D48; }
+.quick-entry__icon.icon-sky { background:linear-gradient(135deg, #F0F9FF, #E0F2FE); }
+.quick-entry__icon.icon-sky svg { stroke:#0284C7; }
+.quick-entry__icon.icon-orange { background:linear-gradient(135deg, #FFF7ED, #FFEDD5); }
+.quick-entry__icon.icon-orange svg { stroke:#EA580C; }
+.quick-entry__icon.icon-emerald { background:linear-gradient(135deg, #ECFDF5, #D1FAE5); }
+.quick-entry__icon.icon-emerald svg { stroke:#059669; }
+.quick-entry__name { font-size:11px; color:var(--text-sec); text-align:center; }
+.quick-entry.disabled { opacity:.5; }
+
+/* Section */
+.section { margin:16px 12px; }
+.section__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.section__title { font-size:16px; font-weight:600; }
+.section__more { font-size:12px; color:var(--primary); cursor:pointer; }
+
+/* Course Cards (horizontal scroll) */
+.course-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; white-space:nowrap; padding-bottom:4px; }
+.course-scroll::-webkit-scrollbar { display:none; }
+.course-card { display:inline-block; width:140px; margin-right:10px; background:#fff; border-radius:8px; overflow:hidden; vertical-align:top; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.course-card img { width:100%; height:90px; object-fit:cover; }
+.course-card__body { padding:8px; white-space:normal; }
+.course-card__title { font-size:12px; font-weight:500; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; }
+.course-card__tag { display:inline-block; font-size:10px; padding:1px 6px; border-radius:3px; background:var(--primary-light); color:var(--primary); margin-top:4px; }
+
+/* Article List */
+.article-card { display:flex; padding:12px; background:#fff; border-radius:8px; margin-bottom:8px; cursor:pointer; }
+.article-card__text { flex:1; margin-right:10px; }
+.article-card__title { font-size:14px; font-weight:500; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.5; }
+.article-card__desc { font-size:12px; color:var(--text-sec); margin-top:4px; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.article-card__meta { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.article-card__tag { font-size:10px; padding:1px 6px; background:var(--primary-light); color:var(--primary); border-radius:3px; }
+.article-card__time { font-size:11px; color:var(--text-third); }
+.article-card__thumb { width:90px; height:68px; border-radius:6px; object-fit:cover; flex-shrink:0; }
+
+/* Learn Page */
+.learn-layout { display:flex; height:calc(100vh - 44px - 56px); }
+.learn-sidebar { width:90px; background:#fff; overflow-y:auto; border-right:1px solid var(--border); flex-shrink:0; }
+.learn-sidebar::-webkit-scrollbar { display:none; }
+.sidebar-item { padding:14px 8px; text-align:center; font-size:12px; color:var(--text-sec); cursor:pointer; border-left:3px solid transparent; transition:all .2s; }
+.sidebar-item.active { background:var(--primary-light); color:var(--primary); border-left-color:var(--primary); font-weight:600; }
+.learn-content { flex:1; overflow-y:auto; padding:12px; }
+.learn-content::-webkit-scrollbar { display:none; }
+.learn-item { background:#fff; border-radius:8px; margin-bottom:10px; overflow:hidden; cursor:pointer; }
+.learn-item img { width:100%; height:120px; object-fit:cover; }
+.learn-item__body { padding:10px; }
+.learn-item__title { font-size:13px; font-weight:500; margin-bottom:4px; }
+.learn-item__meta { font-size:11px; color:var(--text-sec); display:flex; justify-content:space-between; }
+.search-bar { padding:10px 12px; background:#fff; position:sticky; top:44px; z-index:10; }
+.search-input { width:100%; height:34px; background:var(--bg); border:none; border-radius:17px; padding:0 14px; font-size:13px; outline:none; }
+
+/* Activity Page */
+.calendar-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#fff; }
+.calendar-header .month-text { font-size:15px; font-weight:600; }
+.calendar-header .arrow { font-size:18px; cursor:pointer; padding:4px 10px; color:var(--primary); }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); background:#fff; padding:0 8px 12px; }
+.calendar-weekday { text-align:center; font-size:11px; color:var(--text-third); padding:6px 0; }
+.calendar-day { text-align:center; padding:8px 0; position:relative; cursor:pointer; font-size:13px; }
+.calendar-day.today { color:var(--primary); font-weight:700; }
+.calendar-day.selected { background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px; line-height:30px; margin:0 auto; padding:0; }
+.calendar-day .dot { width:4px; height:4px; border-radius:50%; background:var(--primary); position:absolute; bottom:2px; left:50%; transform:translateX(-50%); }
+.activity-card { margin:8px 12px; background:#fff; border-radius:10px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.activity-card img { width:100%; height:120px; object-fit:cover; }
+.activity-card__body { padding:10px 12px; }
+.activity-card__title { font-size:14px; font-weight:600; margin-bottom:4px; }
+.activity-card__info { font-size:12px; color:var(--text-sec); margin-bottom:2px; }
+.activity-card__status { display:inline-block; font-size:10px; padding:2px 8px; border-radius:10px; margin-top:4px; }
+.activity-card__status.ongoing { background:#ECFDF5; color:#059669; }
+.activity-card__status.ended { background:#F3F4F6; color:#6B7280; }
+
+/* Mine Page */
+.mine-header { background:linear-gradient(135deg, #1A56DB, #3B82F6); padding:30px 16px 20px; color:#fff; text-align:center; border-radius:0 0 20px 20px; }
+.mine-avatar { width:60px; height:60px; border-radius:50%; background:rgba(255,255,255,.2); border:2px solid rgba(255,255,255,.4); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+.mine-avatar svg { width:30px; height:30px; stroke:#fff; fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.mine-name { font-size:16px; font-weight:600; }
+.mine-level { font-size:12px; opacity:.85; margin-top:2px; }
+.mine-stats { display:flex; background:#fff; margin:12px; border-radius:10px; padding:16px 0; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.stat-item { flex:1; text-align:center; border-right:1px solid var(--border); }
+.stat-item:last-child { border:none; }
+.stat-value { font-size:20px; font-weight:700; color:var(--primary); }
+.stat-label { font-size:11px; color:var(--text-sec); margin-top:2px; }
+.func-list { margin:12px; background:#fff; border-radius:10px; overflow:hidden; }
+.func-item { display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid var(--border); cursor:pointer; }
+.func-item:last-child { border:none; }
+.func-item__icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-right:12px; }
+.func-item__icon svg { width:18px; height:18px; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+.func-item__icon.fi-blue { background:#EEF2FF; }
+.func-item__icon.fi-blue svg { stroke:#4F46E5; }
+.func-item__icon.fi-violet { background:#F5F3FF; }
+.func-item__icon.fi-violet svg { stroke:#7C3AED; }
+.func-item__icon.fi-teal { background:#F0FDFA; }
+.func-item__icon.fi-teal svg { stroke:#0D9488; }
+.func-item__icon.fi-amber { background:#FFFBEB; }
+.func-item__icon.fi-amber svg { stroke:#D97706; }
+.func-item__icon.fi-rose { background:#FFF1F2; }
+.func-item__icon.fi-rose svg { stroke:#E11D48; }
+.func-item__icon.fi-slate { background:#F1F5F9; }
+.func-item__icon.fi-slate svg { stroke:#475569; }
+.func-item__icon.fi-sky { background:#F0F9FF; }
+.func-item__icon.fi-sky svg { stroke:#0284C7; }
+.func-item__icon.fi-emerald { background:#ECFDF5; }
+.func-item__icon.fi-emerald svg { stroke:#059669; }
+.func-item__name { flex:1; font-size:14px; }
+.func-item__badge { background:var(--danger); color:#fff; font-size:10px; padding:1px 6px; border-radius:10px; margin-right:8px; }
+.func-item__arrow { color:var(--text-third); font-size:16px; }
+
+/* Register Page */
+.draft-bar { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; background:#FEFCE8; border-bottom:1px solid #FEF08A; font-size:11px; color:#A16207; }
+.draft-bar__left { display:flex; align-items:center; gap:4px; }
+.draft-bar__left svg { width:14px; height:14px; stroke:#A16207; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.draft-bar__right { display:flex; align-items:center; gap:10px; }
+.draft-bar__clear { color:#DC2626; cursor:pointer; font-weight:500; }
+.draft-bar.saved { background:#ECFDF5; border-color:#A7F3D0; color:#047857; }
+.draft-bar.saved svg { stroke:#047857; }
+.draft-bar.saving { background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8; }
+.draft-bar.saving svg { stroke:#1D4ED8; }
+
+.smart-fill-btn { position:fixed; bottom:80px; right:20px; width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg, #7C3AED, #4F46E5); color:#fff; border:none; box-shadow:0 4px 14px rgba(79,70,229,.4); cursor:pointer; display:none; z-index:300; align-items:center; justify-content:center; transition:transform .2s, box-shadow .2s; }
+.smart-fill-btn:active { transform:scale(.92); }
+.smart-fill-btn svg { width:22px; height:22px; stroke:#fff; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.smart-fill-btn.show { display:flex; }
+
+.sf-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:400; display:none; align-items:flex-end; justify-content:center; }
+.sf-overlay.show { display:flex; }
+.sf-sheet { width:100%; max-width:375px; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px; max-height:75vh; display:flex; flex-direction:column; animation:slideUp .3s ease; }
+@keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+.sf-sheet__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.sf-sheet__title { font-size:16px; font-weight:600; }
+.sf-sheet__close { width:28px; height:28px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; }
+.sf-sheet__close svg { width:16px; height:16px; stroke:var(--text-sec); fill:none; stroke-width:2; stroke-linecap:round; }
+.sf-sheet__desc { font-size:12px; color:var(--text-sec); margin-bottom:10px; line-height:1.5; }
+.sf-textarea { width:100%; height:140px; border:1.5px solid var(--border); border-radius:10px; padding:12px; font-size:13px; line-height:1.6; resize:none; outline:none; transition:border .2s; font-family:inherit; }
+.sf-textarea:focus { border-color:var(--primary); }
+.sf-textarea::placeholder { color:var(--text-third); }
+.sf-actions { display:flex; gap:8px; margin-top:12px; }
+.sf-actions .btn { font-size:13px; height:38px; }
+.sf-result { margin-top:12px; padding:10px; background:#F0FDF4; border-radius:8px; font-size:12px; color:#166534; line-height:1.6; display:none; }
+.sf-result.show { display:block; }
+.sf-result__item { display:flex; align-items:center; gap:4px; padding:2px 0; }
+.sf-result__item::before { content:'✓'; color:#059669; font-weight:700; font-size:11px; }
+.steps-bar { display:flex; padding:20px 16px; background:#fff; margin-bottom:12px; }
+.step-item { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; }
+.step-circle { width:28px; height:28px; border-radius:50%; background:var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:var(--text-sec); transition:all .3s; }
+.step-item.active .step-circle { background:var(--primary); color:#fff; }
+.step-item.done .step-circle { background:var(--success); color:#fff; }
+.step-label { font-size:10px; color:var(--text-sec); margin-top:4px; }
+.step-item.active .step-label { color:var(--primary); font-weight:500; }
+.step-line { position:absolute; top:14px; left:calc(50% + 18px); width:calc(100% - 36px); height:2px; background:var(--border); }
+.step-item.done .step-line { background:var(--success); }
+.form-section { padding:16px; background:#fff; margin:0 12px; border-radius:10px; }
+.form-title { font-size:15px; font-weight:600; margin-bottom:12px; }
+.form-group { margin-bottom:14px; }
+.form-label { font-size:12px; color:var(--text-sec); margin-bottom:4px; display:block; }
+.form-input { width:100%; height:40px; border:1px solid var(--border); border-radius:8px; padding:0 12px; font-size:14px; outline:none; transition:border .2s; }
+.form-input:focus { border-color:var(--primary); }
+.form-btns { display:flex; gap:10px; padding:16px; margin-top:12px; }
+.btn { flex:1; height:42px; border:none; border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-outline { background:#fff; color:var(--primary); border:1px solid var(--primary); }
+.btn-gray { background:var(--bg); color:var(--text-sec); }
+
+/* Register Guide */
+.guide-flow { padding:16px; background:#fff; margin:12px; border-radius:10px; }
+.flow-step { display:flex; align-items:flex-start; margin-bottom:16px; position:relative; padding-left:36px; }
+.flow-step::before { content:''; position:absolute; left:14px; top:24px; width:2px; height:calc(100% + 4px); background:var(--border); }
+.flow-step:last-child::before { display:none; }
+.flow-num { position:absolute; left:4px; top:0; width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center; }
+.flow-title { font-size:14px; font-weight:500; }
+.flow-desc { font-size:12px; color:var(--text-sec); margin-top:2px; }
+.material-list { padding:16px; background:#fff; margin:12px; border-radius:10px; }
+.material-item { display:flex; align-items:center; padding:8px 0; font-size:13px; }
+.material-item::before { content:'✓'; color:var(--success); margin-right:8px; font-weight:700; }
+.faq-section { margin:12px; }
+.faq-item { background:#fff; border-radius:8px; margin-bottom:8px; overflow:hidden; }
+.faq-q { padding:12px 16px; font-size:13px; font-weight:500; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+.faq-q::after { content:'▸'; transition:transform .3s; color:var(--text-third); }
+.faq-item.open .faq-q::after { transform:rotate(90deg); }
+.faq-a { padding:0 16px; max-height:0; overflow:hidden; transition:all .3s; font-size:12px; color:var(--text-sec); line-height:1.6; }
+.faq-item.open .faq-a { padding:0 16px 12px; max-height:200px; }
+
+/* Progress Page */
+.progress-nodes { display:flex; align-items:center; justify-content:center; padding:24px 16px; background:#fff; margin:12px; border-radius:10px; }
+.p-node { display:flex; flex-direction:column; align-items:center; }
+.p-node__circle { width:36px; height:36px; border-radius:50%; background:var(--border); display:flex; align-items:center; justify-content:center; font-size:14px; }
+.p-node.active .p-node__circle { background:var(--primary); color:#fff; }
+.p-node.done .p-node__circle { background:var(--success); color:#fff; }
+.p-node__label { font-size:10px; color:var(--text-sec); margin-top:4px; text-align:center; }
+.p-line { width:40px; height:2px; background:var(--border); margin:0 4px; margin-bottom:16px; }
+.p-line.done { background:var(--success); }
+.pid-section { margin:12px; padding:16px; background:#fff; border-radius:10px; }
+.pid-input-row { display:flex; gap:8px; margin-top:8px; }
+.pid-input-row input { flex:1; }
+.pid-input-row .btn { flex:0 0 80px; }
+
+/* Growth Page */
+.growth-header { background:linear-gradient(135deg, #1A56DB, #7C3AED); padding:20px 16px; color:#fff; margin:12px; border-radius:12px; }
+.growth-level { font-size:20px; font-weight:700; }
+.growth-title { font-size:12px; opacity:.85; margin-top:2px; }
+.growth-progress { margin-top:12px; }
+.progress-bar { width:100%; height:6px; background:rgba(255,255,255,.3); border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; background:#fff; border-radius:3px; transition:width .5s; }
+.progress-text { font-size:11px; opacity:.8; margin-top:4px; text-align:right; }
+.growth-tabs { display:flex; margin:0 12px; background:#fff; border-radius:8px 8px 0 0; }
+.growth-tab { flex:1; padding:12px; text-align:center; font-size:13px; color:var(--text-sec); cursor:pointer; border-bottom:2px solid transparent; }
+.growth-tab.active { color:var(--primary); font-weight:600; border-bottom-color:var(--primary); }
+.growth-list { margin:0 12px; background:#fff; border-radius:0 0 8px 8px; padding:8px; }
+.growth-item { display:flex; align-items:center; padding:10px; border-bottom:1px solid var(--border); cursor:pointer; }
+.growth-item:last-child { border:none; }
+.growth-item.locked { opacity:.5; }
+.growth-item img { width:50px; height:34px; border-radius:4px; object-fit:cover; margin-right:10px; }
+.growth-item__info { flex:1; }
+.growth-item__title { font-size:13px; font-weight:500; }
+.growth-item__progress { font-size:11px; color:var(--text-sec); margin-top:2px; }
+.growth-item__lock { width:18px; height:18px; display:flex; align-items:center; justify-content:center; }
+.growth-item__lock svg { width:16px; height:16px; stroke:var(--text-third); fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.growth-stats { display:flex; margin:12px; background:#fff; border-radius:10px; padding:14px; }
+
+/* Calculator */
+.calc-section { padding:16px; margin:12px; background:#fff; border-radius:10px; }
+.calc-select { width:100%; height:40px; border:1px solid var(--border); border-radius:8px; padding:0 12px; font-size:14px; background:#fff; margin-bottom:12px; outline:none; }
+.calc-result { margin:12px; padding:16px; background:var(--primary-light); border-radius:10px; }
+.calc-rate { font-size:28px; font-weight:700; color:var(--primary); }
+.calc-detail { font-size:12px; color:var(--text-sec); margin-top:4px; }
+.incentive-tip { margin:12px; padding:12px; background:#FEF3C7; border-radius:8px; font-size:12px; color:#92400E; display:flex; align-items:flex-start; gap:6px; }
+.incentive-tip .ic-bulb { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+.incentive-tip .ic-bulb svg { width:16px; height:16px; stroke:#D97706; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+
+/* AI Chat */
+.chat-container { display:flex; flex-direction:column; height:calc(100vh - 44px); }
+.chat-messages { flex:1; overflow-y:auto; padding:12px; }
+.chat-bubble { margin-bottom:12px; display:flex; }
+.chat-bubble.ai { justify-content:flex-start; }
+.chat-bubble.user { justify-content:flex-end; }
+.bubble-content { max-width:75%; padding:10px 14px; border-radius:12px; font-size:13px; line-height:1.6; white-space:pre-wrap; }
+.chat-bubble.ai .bubble-content { background:#fff; border-bottom-left-radius:4px; }
+.chat-bubble.user .bubble-content { background:var(--primary); color:#fff; border-bottom-right-radius:4px; }
+.quick-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.quick-chip { font-size:11px; padding:5px 10px; background:var(--primary-light); color:var(--primary); border-radius:14px; cursor:pointer; border:none; }
+.chat-input-bar { display:flex; padding:8px 12px; background:#fff; border-top:1px solid var(--border); gap:8px; }
+.chat-input { flex:1; height:36px; border:1px solid var(--border); border-radius:18px; padding:0 14px; font-size:13px; outline:none; }
+.chat-send-btn { width:36px; height:36px; border:none; background:var(--primary); color:#fff; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.chat-send-btn svg { width:18px; height:18px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.thinking-indicator { padding:10px 14px; background:#fff; border-radius:12px; border-bottom-left-radius:4px; display:inline-block; }
+.thinking-indicator span { display:inline-block; width:6px; height:6px; background:var(--text-third); border-radius:50%; margin:0 2px; animation:bounce .6s infinite alternate; }
+.thinking-indicator span:nth-child(2) { animation-delay:.2s; }
+.thinking-indicator span:nth-child(3) { animation-delay:.4s; }
+@keyframes bounce { to { transform:translateY(-4px); opacity:.4; } }
+
+/* Activity Detail */
+.detail-cover { width:100%; height:180px; object-fit:cover; }
+.detail-info { padding:16px; background:#fff; }
+.detail-title { font-size:17px; font-weight:700; margin-bottom:8px; }
+.detail-meta { font-size:12px; color:var(--text-sec); line-height:1.8; }
+.detail-tabs { display:flex; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:44px; z-index:10; }
+.detail-tab { flex:1; padding:12px; text-align:center; font-size:13px; color:var(--text-sec); cursor:pointer; border-bottom:2px solid transparent; }
+.detail-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:500; }
+.detail-content { padding:16px; font-size:13px; line-height:1.8; color:var(--text); }
+.detail-bottom-btn { position:sticky; bottom:0; padding:12px 16px; background:#fff; border-top:1px solid var(--border); display:flex; gap:10px; }
+.detail-bottom-btn .btn-primary { flex:1; }
+.detail-bottom-btn .btn-outline { flex:0 0 auto; width:44px; height:44px; padding:0; display:flex; align-items:center; justify-content:center; }
+
+/* Checkin Result */
+.checkin-page { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 44px); padding:20px; text-align:center; }
+.checkin-icon { width:72px; height:72px; margin:0 auto 16px; border-radius:50%; background:linear-gradient(135deg, #ECFDF5, #D1FAE5); display:flex; align-items:center; justify-content:center; }
+.checkin-icon svg { width:36px; height:36px; stroke:#059669; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.checkin-title { font-size:18px; font-weight:600; margin-bottom:8px; }
+.checkin-desc { font-size:13px; color:var(--text-sec); margin-bottom:24px; }
+
+/* Messages */
+.msg-tabs { display:flex; background:#fff; border-bottom:1px solid var(--border); position:sticky; top:44px; z-index:10; }
+.msg-tab { flex:1; padding:10px; text-align:center; font-size:13px; color:var(--text-sec); cursor:pointer; border-bottom:2px solid transparent; }
+.msg-tab.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:500; }
+.msg-list { padding:8px 12px; }
+.msg-item { display:flex; align-items:flex-start; padding:12px; background:#fff; border-radius:8px; margin-bottom:8px; cursor:pointer; }
+.msg-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); margin-right:10px; margin-top:4px; flex-shrink:0; }
+.msg-dot.read { background:transparent; }
+.msg-item__content { flex:1; }
+.msg-item__title { font-size:13px; font-weight:500; }
+.msg-item__desc { font-size:12px; color:var(--text-sec); margin-top:2px; }
+.msg-item__time { font-size:11px; color:var(--text-third); margin-top:4px; }
+
+/* Search Page */
+.search-page-bar { display:flex; padding:10px 12px; background:#fff; gap:8px; align-items:center; }
+.search-page-bar input { flex:1; height:34px; background:var(--bg); border:none; border-radius:17px; padding:0 14px; font-size:13px; outline:none; }
+.search-page-bar .cancel { font-size:13px; color:var(--primary); cursor:pointer; }
+.hot-tags { padding:16px; }
+.hot-tags__title { font-size:13px; font-weight:600; margin-bottom:10px; }
+.hot-tags__list { display:flex; flex-wrap:wrap; gap:8px; }
+.hot-tag { padding:5px 12px; background:#fff; border-radius:14px; font-size:12px; color:var(--text-sec); cursor:pointer; }
+
+/* Content Detail */
+.content-detail { padding:16px; background:#fff; min-height:calc(100vh - 44px - 50px); }
+.content-detail__title { font-size:18px; font-weight:700; line-height:1.4; margin-bottom:10px; }
+.content-detail__meta { font-size:12px; color:var(--text-sec); margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.content-detail__body { font-size:14px; line-height:1.8; color:var(--text); }
+.content-detail__body p { margin-bottom:12px; }
+.content-bottom-bar { position:sticky; bottom:0; display:flex; padding:10px 16px; background:#fff; border-top:1px solid var(--border); gap:16px; }
+.action-btn { display:flex; align-items:center; gap:4px; font-size:13px; color:var(--text-sec); cursor:pointer; padding:6px 12px; border-radius:16px; background:var(--bg); }
+
+/* Site Selection (Register) */
+.site-select { padding:16px 12px; }
+.site-select__title { font-size:16px; font-weight:600; margin-bottom:4px; }
+.site-select__desc { font-size:12px; color:var(--text-sec); margin-bottom:14px; }
+.site-select-card { background:#fff; border:1.5px solid var(--border); border-radius:12px; padding:14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s, box-shadow .2s; }
+.site-select-card:active { border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,86,219,.1); }
+.site-select-card__header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.site-select-card__flag { font-size:24px; }
+.site-select-card__name { font-size:14px; font-weight:600; flex:1; }
+.site-select-card__badge { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:500; }
+.site-select-card__badge.hot { background:#FEE2E2; color:#DC2626; }
+.site-select-card__badge.grow { background:#D1FAE5; color:#059669; }
+.site-select-card__badge.new { background:#E0E7FF; color:#4338CA; }
+.site-select-card__info { font-size:12px; color:var(--text-sec); line-height:1.6; margin-bottom:8px; }
+.site-select-card__req { font-size:11px; color:var(--text-third); display:flex; align-items:center; gap:4px; }
+.site-select-card__req svg { width:12px; height:12px; stroke:var(--text-third); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.site-select-card.disabled { opacity:.6; }
+.site-select-card.disabled::after { content:'暂未开放'; position:absolute; right:14px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--text-third); }
+.site-select-card { position:relative; }
+.site-section { margin:12px; }
+.site-section__title { font-size:15px; font-weight:600; margin-bottom:10px; }
+.site-card { background:#fff; border-radius:12px; margin-bottom:10px; overflow:hidden; border:1px solid var(--border); transition:box-shadow .2s; }
+.site-card:active { box-shadow:0 2px 12px rgba(0,0,0,.08); }
+.site-card__header { display:flex; align-items:center; padding:14px 14px 0; gap:10px; }
+.site-card__flag { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; background:#F8FAFC; border:1px solid var(--border); }
+.site-card__meta { flex:1; }
+.site-card__name { font-size:14px; font-weight:600; display:block; }
+.site-card__url { font-size:11px; color:var(--primary); display:block; margin-top:1px; }
+.site-card__badge { font-size:10px; padding:2px 8px; border-radius:10px; background:#ECFDF5; color:#059669; font-weight:500; }
+.site-card__body { padding:10px 14px 14px; }
+.site-card__desc { font-size:12px; color:var(--text-sec); line-height:1.6; margin-bottom:10px; }
+.site-card__stats { display:flex; gap:6px; flex-wrap:wrap; }
+.site-stat { display:inline-flex; align-items:center; gap:3px; font-size:11px; color:var(--text); background:#F8FAFC; padding:4px 8px; border-radius:6px; border:1px solid #F1F5F9; }
+.site-stat svg { width:12px; height:12px; stroke:var(--primary); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.site-card__tags { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.site-tag { font-size:10px; padding:3px 8px; border-radius:4px; background:var(--primary-light); color:var(--primary); }
+
+/* Activity Registration Flow */
+.reg-modal { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; align-items:center; justify-content:center; }
+.reg-modal.show { display:flex; }
+.reg-modal__box { width:90%; max-width:340px; background:#fff; border-radius:16px; padding:24px 20px; text-align:center; animation:slideUp .3s ease; }
+.reg-modal__title { font-size:16px; font-weight:600; margin-bottom:8px; }
+.reg-modal__desc { font-size:12px; color:var(--text-sec); margin-bottom:16px; line-height:1.5; }
+.reg-modal__qr { width:160px; height:160px; margin:0 auto 16px; background:#F8FAFC; border:2px dashed var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; }
+.reg-modal__qr svg { width:48px; height:48px; stroke:var(--text-third); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.reg-modal__qr span { font-size:11px; color:var(--text-third); }
+.reg-modal__form { text-align:left; }
+.reg-modal__form .form-group { margin-bottom:12px; }
+.reg-modal__step { display:none; }
+.reg-modal__step.active { display:block; }
+.reg-modal__close { position:absolute; top:12px; right:12px; width:28px; height:28px; border-radius:50%; background:var(--bg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.reg-modal__close svg { width:14px; height:14px; stroke:var(--text-sec); fill:none; stroke-width:2.5; stroke-linecap:round; }
+.reg-modal__box { position:relative; }
+.reg-status { text-align:center; padding:20px 0; }
+.reg-status__icon { width:56px; height:56px; border-radius:50%; background:#FEF3C7; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+.reg-status__icon svg { width:28px; height:28px; stroke:#D97706; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.reg-status__title { font-size:15px; font-weight:600; margin-bottom:4px; }
+.reg-status__desc { font-size:12px; color:var(--text-sec); }
+
+/* Share Sheet */
+.share-sheet { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; align-items:flex-end; justify-content:center; }
+.share-sheet.show { display:flex; }
+.share-sheet__box { width:100%; max-width:375px; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px calc(20px + env(safe-area-inset-bottom)); }
+.share-sheet__title { font-size:14px; font-weight:600; text-align:center; margin-bottom:16px; }
+.share-sheet__grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.share-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
+.share-item__icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
+.share-item__icon.wechat { background:#07C160; }
+.share-item__icon.moments { background:#07C160; }
+.share-item__icon.link { background:#3B82F6; }
+.share-item__icon.poster { background:#8B5CF6; }
+.share-item__icon svg { width:22px; height:22px; stroke:#fff; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.share-item__name { font-size:11px; color:var(--text-sec); }
+.share-sheet__cancel { margin-top:12px; text-align:center; padding:12px; font-size:14px; color:var(--text-sec); cursor:pointer; border-top:1px solid var(--border); }
+
+/* Invite List */
+.invite-list { padding:12px; }
+.invite-item { display:flex; align-items:center; padding:12px; background:#fff; border-radius:10px; margin-bottom:8px; }
+.invite-item__avatar { width:36px; height:36px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; margin-right:10px; }
+.invite-item__avatar svg { width:18px; height:18px; stroke:var(--text-third); fill:none; stroke-width:1.75; }
+.invite-item__info { flex:1; }
+.invite-item__name { font-size:13px; font-weight:500; }
+.invite-item__time { font-size:11px; color:var(--text-third); }
+.invite-item__status { font-size:11px; padding:2px 8px; border-radius:10px; font-weight:500; }
+.invite-item__status.accepted { background:#D1FAE5; color:#059669; }
+.invite-item__status.pending { background:#FEF3C7; color:#D97706; }
+.invite-item__status.rejected { background:#FEE2E2; color:#DC2626; }
+
+/* Punch Card */
+.punch-section { padding:12px; }
+.punch-section__title { font-size:14px; font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.punch-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.punch-point { background:#fff; border-radius:10px; padding:14px; text-align:center; border:1.5px solid var(--border); transition:all .2s; }
+.punch-point.done { border-color:#059669; background:#ECFDF5; }
+.punch-point__icon { width:36px; height:36px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+.punch-point__icon svg { width:18px; height:18px; stroke:var(--text-sec); fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.punch-point.done .punch-point__icon { background:#D1FAE5; }
+.punch-point.done .punch-point__icon svg { stroke:#059669; }
+.punch-point__name { font-size:12px; font-weight:500; margin-bottom:6px; }
+.punch-point__btn { font-size:11px; padding:4px 12px; border-radius:12px; border:1px solid var(--primary); color:var(--primary); background:none; cursor:pointer; }
+.punch-point.done .punch-point__btn { border-color:#059669; color:#059669; background:#D1FAE5; pointer-events:none; }
+
+/* Scanner UI */
+.scanner-area { width:200px; height:200px; margin:20px auto; border-radius:16px; background:#000; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.scanner-area::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,#00ff00,transparent); animation:scan 2s linear infinite; }
+@keyframes scan { 0%{top:0;} 100%{top:100%;} }
+.scanner-area svg { width:64px; height:64px; stroke:rgba(255,255,255,.5); fill:none; stroke-width:1; }
+.scanner-corners { position:absolute; inset:12px; border:2px solid rgba(255,255,255,.3); border-radius:8px; }
+
+/* Activity Registration Flow */
+.reg-modal { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; align-items:center; justify-content:center; }
+.reg-modal.show { display:flex; }
+.reg-modal__box { width:90%; max-width:340px; background:#fff; border-radius:16px; padding:24px 20px; text-align:center; position:relative; }
+.reg-modal__title { font-size:16px; font-weight:600; margin-bottom:8px; }
+.reg-modal__desc { font-size:12px; color:var(--text-sec); margin-bottom:16px; line-height:1.5; }
+.reg-modal__qr { width:160px; height:160px; margin:0 auto 16px; background:#F8FAFC; border:2px dashed var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; }
+.reg-modal__qr svg { width:48px; height:48px; stroke:var(--text-third); fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.reg-modal__qr span { font-size:11px; color:var(--text-third); }
+.reg-modal__form { text-align:left; }
+.reg-modal__form .form-group { margin-bottom:12px; }
+.reg-modal__step { display:none; }
+.reg-modal__step.active { display:block; }
+.reg-modal__close { position:absolute; top:12px; right:12px; width:28px; height:28px; border-radius:50%; background:var(--bg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.reg-modal__close svg { width:14px; height:14px; stroke:var(--text-sec); fill:none; stroke-width:2.5; stroke-linecap:round; }
+.reg-status { text-align:center; padding:20px 0; }
+.reg-status__icon { width:56px; height:56px; border-radius:50%; background:#FEF3C7; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+.reg-status__icon svg { width:28px; height:28px; stroke:#D97706; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.reg-status__title { font-size:15px; font-weight:600; margin-bottom:4px; }
+.reg-status__desc { font-size:12px; color:var(--text-sec); }
+.share-sheet { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:none; align-items:flex-end; justify-content:center; }
+.share-sheet.show { display:flex; }
+.share-sheet__box { width:100%; max-width:375px; background:#fff; border-radius:16px 16px 0 0; padding:20px 16px; }
+.share-sheet__title { font-size:14px; font-weight:600; text-align:center; margin-bottom:16px; }
+.share-sheet__grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.share-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
+.share-item__icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
+.share-item__icon.wechat { background:#07C160; }
+.share-item__icon.moments { background:#07C160; }
+.share-item__icon.link { background:#3B82F6; }
+.share-item__icon.poster { background:#8B5CF6; }
+.share-item__icon svg { width:22px; height:22px; stroke:#fff; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.share-item__name { font-size:11px; color:var(--text-sec); }
+.share-sheet__cancel { margin-top:12px; text-align:center; padding:12px; font-size:14px; color:var(--text-sec); cursor:pointer; border-top:1px solid var(--border); }
+.invite-list { padding:12px 0; }
+.invite-item { display:flex; align-items:center; padding:12px; background:#fff; border-radius:10px; margin-bottom:8px; }
+.invite-item__avatar { width:36px; height:36px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; margin-right:10px; }
+.invite-item__avatar svg { width:18px; height:18px; stroke:var(--text-third); fill:none; stroke-width:1.75; }
+.invite-item__info { flex:1; }
+.invite-item__name { font-size:13px; font-weight:500; }
+.invite-item__time { font-size:11px; color:var(--text-third); }
+.invite-item__status { font-size:11px; padding:2px 8px; border-radius:10px; font-weight:500; }
+.invite-item__status.accepted { background:#D1FAE5; color:#059669; }
+.invite-item__status.pending { background:#FEF3C7; color:#D97706; }
+.invite-item__status.rejected { background:#FEE2E2; color:#DC2626; }
+.punch-section { padding:12px; }
+.punch-section__title { font-size:14px; font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.punch-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.punch-point { background:#fff; border-radius:10px; padding:14px; text-align:center; border:1.5px solid var(--border); transition:all .2s; }
+.punch-point.done { border-color:#059669; background:#ECFDF5; }
+.punch-point__icon { width:36px; height:36px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+.punch-point__icon svg { width:18px; height:18px; stroke:var(--text-sec); fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.punch-point.done .punch-point__icon { background:#D1FAE5; }
+.punch-point.done .punch-point__icon svg { stroke:#059669; }
+.punch-point__name { font-size:12px; font-weight:500; margin-bottom:6px; }
+.punch-point__btn { font-size:11px; padding:4px 12px; border-radius:12px; border:1px solid var(--primary); color:var(--primary); background:none; cursor:pointer; }
+.punch-point.done .punch-point__btn { border-color:#059669; color:#059669; background:#D1FAE5; pointer-events:none; }
+.scanner-area { width:200px; height:200px; margin:20px auto; border-radius:16px; background:#000; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.scanner-area::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,#00ff00,transparent); animation:scan 2s linear infinite; }
+@keyframes scan { 0%{top:0;} 100%{top:100%;} }
+.scanner-area svg { width:64px; height:64px; stroke:rgba(255,255,255,.5); fill:none; stroke-width:1; }
+.scanner-corners { position:absolute; inset:12px; border:2px solid rgba(255,255,255,.3); border-radius:8px; }
+
+/* Inline content icons */
+.ic { display:inline-flex; width:14px; height:14px; vertical-align:-2px; margin-right:3px; }
+.ic svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.ic-tip { display:inline-flex; width:16px; height:16px; vertical-align:-3px; margin-right:4px; }
+.ic-tip svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; padding:10px 20px; border-radius:8px; font-size:13px; z-index:9999; opacity:0; transition:opacity .3s; pointer-events:none; }
+.toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="app-container" id="app">
+
+<!-- ========== PAGE 1: 首页 (Tab1) ========== -->
+<div class="page active" id="page-home">
+  <div class="nav-bar">沃尔玛卖家中心</div>
+  <div class="banner-wrap">
+    <div class="banner-track" id="bannerTrack">
+      <div class="banner-slide" onclick="navigateTo('page-activity-detail')"><img src="assets/banner1.jpg" alt="banner1"></div>
+      <div class="banner-slide" onclick="navigateTo('page-content-detail')"><img src="assets/banner2.jpg" alt="banner2"></div>
+      <div class="banner-slide" onclick="navigateTo('page-content-detail')"><img src="assets/banner3.jpg" alt="banner3"></div>
+    </div>
+    <div class="banner-dots" id="bannerDots">
+      <div class="banner-dot active"></div>
+      <div class="banner-dot"></div>
+      <div class="banner-dot"></div>
+    </div>
+  </div>
+
+  <div class="status-card" onclick="navigateTo('page-register-guide')">
+    <span class="status-card__icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg></span>
+    <div class="status-card__info">
+      <span class="status-card__title">了解沃尔玛入驻流程</span>
+      <span class="status-card__desc">开启跨境电商新征程</span>
+    </div>
+    <span class="status-card__arrow">›</span>
+  </div>
+
+  <div class="quick-entries">
+    <div class="quick-entry" onclick="navigateTo('page-calculator')">
+      <span class="quick-entry__icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="8" y2="18.01"/><line x1="12" y1="18" x2="16" y2="18"/></svg></span>
+      <span class="quick-entry__name">佣金计算</span>
+    </div>
+    <div class="quick-entry" onclick="navigateTo('page-ai')">
+      <span class="quick-entry__icon icon-violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1m0 16v1m-7.07-2.93l.71-.71m12.02-12.02l.71-.71M3 12h1m16 0h1m-2.93 7.07l-.71-.71M5.64 5.64l-.71-.71"/><circle cx="12" cy="12" r="4"/><path d="M12 8a4 4 0 014 4"/></svg></span>
+      <span class="quick-entry__name">AI助手</span>
+    </div>
+    <div class="quick-entry" onclick="switchTab(2)">
+      <span class="quick-entry__icon icon-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M10 14l2 2 4-4"/></svg></span>
+      <span class="quick-entry__name">活动中心</span>
+    </div>
+    <div class="quick-entry" onclick="navigateTo('page-growth')">
+      <span class="quick-entry__icon icon-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M8 7h8M8 11h6"/></svg></span>
+      <span class="quick-entry__name">成长中心</span>
+    </div>
+    <div class="quick-entry" onclick="navigateTo('page-register')">
+      <span class="quick-entry__icon icon-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span>
+      <span class="quick-entry__name">沃要开店</span>
+    </div>
+    <div class="quick-entry disabled" onclick="showToast('敬请期待')">
+      <span class="quick-entry__icon icon-sky"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg></span>
+      <span class="quick-entry__name">敬请期待</span>
+    </div>
+    <div class="quick-entry disabled" onclick="showToast('敬请期待')">
+      <span class="quick-entry__icon icon-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg></span>
+      <span class="quick-entry__name">敬请期待</span>
+    </div>
+    <div class="quick-entry disabled" onclick="showToast('敬请期待')">
+      <span class="quick-entry__icon icon-emerald"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polyline points="16,8 20,8 23,11 23,16 20,16"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/><line x1="8" y1="16" x2="16" y2="16"/></svg></span>
+      <span class="quick-entry__name">敬请期待</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section__header">
+      <span class="section__title">为你推荐</span>
+      <span class="section__more" onclick="navigateTo('page-growth')">查看全部 &gt;</span>
+    </div>
+    <div class="course-scroll">
+      <div class="course-card" onclick="navigateTo('page-content-detail')">
+        <img src="assets/course1.jpg" alt="course">
+        <div class="course-card__body"><div class="course-card__title">入驻准备指南</div><span class="course-card__tag">必修</span></div>
+      </div>
+      <div class="course-card" onclick="navigateTo('page-content-detail')">
+        <img src="assets/course2.jpg" alt="course">
+        <div class="course-card__body"><div class="course-card__title">店铺设置教程</div><span class="course-card__tag">必修</span></div>
+      </div>
+      <div class="course-card" onclick="navigateTo('page-content-detail')">
+        <img src="assets/course3.jpg" alt="course">
+        <div class="course-card__body"><div class="course-card__title">首批上架攻略</div><span class="course-card__tag">选修</span></div>
+      </div>
+      <div class="course-card" onclick="navigateTo('page-content-detail')">
+        <img src="assets/course4.jpg" alt="course">
+        <div class="course-card__body"><div class="course-card__title">物流模式解析</div><span class="course-card__tag">选修</span></div>
+      </div>
+      <div class="course-card" onclick="navigateTo('page-content-detail')">
+        <img src="assets/course5.jpg" alt="course">
+        <div class="course-card__body"><div class="course-card__title">广告投放基础</div><span class="course-card__tag">选修</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section__header">
+      <span class="section__title">最新资讯</span>
+    </div>
+    <div class="article-card" onclick="navigateTo('page-content-detail')">
+      <div class="article-card__text">
+        <div class="article-card__title">2026年Q3沃尔玛招商政策更新</div>
+        <div class="article-card__desc">了解最新入驻政策和佣金优惠</div>
+        <div class="article-card__meta"><span class="article-card__tag">政策</span><span class="article-card__time">2小时前</span></div>
+      </div>
+      <img class="article-card__thumb" src="assets/article1.jpg" alt="article">
+    </div>
+    <div class="article-card" onclick="navigateTo('page-content-detail')">
+      <div class="article-card__text">
+        <div class="article-card__title">新卖家必读：Perfect Launch完全指南</div>
+        <div class="article-card__desc">从0到1完成店铺上线的核心步骤</div>
+        <div class="article-card__meta"><span class="article-card__tag">教程</span><span class="article-card__time">昨天</span></div>
+      </div>
+      <img class="article-card__thumb" src="assets/article2.jpg" alt="article">
+    </div>
+    <div class="article-card" onclick="navigateTo('page-content-detail')">
+      <div class="article-card__text">
+        <div class="article-card__title">跨境物流成本优化实战技巧</div>
+        <div class="article-card__desc">降低物流费用的5个关键策略</div>
+        <div class="article-card__meta"><span class="article-card__tag">运营</span><span class="article-card__time">3天前</span></div>
+      </div>
+      <img class="article-card__thumb" src="assets/article3.jpg" alt="article">
+    </div>
+  </div>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- ========== PAGE 2: 知识学堂 (Tab2) ========== -->
+<div class="page" id="page-learn">
+  <div class="nav-bar">知识学堂</div>
+  <div class="search-bar" onclick="navigateTo('page-search')">
+    <input class="search-input" placeholder="搜索课程、文章..." readonly>
+  </div>
+  <div class="learn-layout">
+    <div class="learn-sidebar" id="learnSidebar">
+      <div class="sidebar-item active" data-cat="all" onclick="switchCategory(this)">全部</div>
+      <div class="sidebar-item" data-cat="getting-started" onclick="switchCategory(this)">入门指南</div>
+      <div class="sidebar-item" data-cat="product" onclick="switchCategory(this)">商品管理</div>
+      <div class="sidebar-item" data-cat="operation" onclick="switchCategory(this)">店铺运营</div>
+      <div class="sidebar-item" data-cat="logistics" onclick="switchCategory(this)">物流仓储</div>
+      <div class="sidebar-item" data-cat="policy" onclick="switchCategory(this)">政策规则</div>
+      <div class="sidebar-item" data-cat="tools" onclick="switchCategory(this)">工具教程</div>
+      <div class="sidebar-item" data-cat="ads" onclick="switchCategory(this)">广告投放</div>
+    </div>
+    <div class="learn-content">
+      <div class="learn-item" onclick="navigateTo('page-content-detail')">
+        <img src="assets/article1.jpg" style="height:100px;" alt="content">
+        <div class="learn-item__body">
+          <div class="learn-item__title">沃尔玛卖家入驻完整流程指南(2026最新版)</div>
+          <div class="learn-item__meta"><span>入门</span><span>2小时前</span></div>
+        </div>
+      </div>
+      <div class="learn-item" onclick="navigateTo('page-content-detail')">
+        <img src="assets/video1.jpg" style="height:100px;" alt="content">
+        <div class="learn-item__body">
+          <div class="learn-item__title">手把手教你优化Listing标题和关键词</div>
+          <div class="learn-item__meta"><span>运营 · 视频 12:30</span><span>5小时前</span></div>
+        </div>
+      </div>
+      <div class="learn-item" onclick="navigateTo('page-content-detail')">
+        <img src="assets/article2.jpg" style="height:100px;" alt="content">
+        <div class="learn-item__body">
+          <div class="learn-item__title">2026年Q3佣金政策变更解读</div>
+          <div class="learn-item__meta"><span>政策</span><span>1天前</span></div>
+        </div>
+      </div>
+      <div class="learn-item" onclick="navigateTo('page-content-detail')">
+        <img src="assets/video2.jpg" style="height:100px;" alt="content">
+        <div class="learn-item__body">
+          <div class="learn-item__title">广告投放ROI优化实战技巧</div>
+          <div class="learn-item__meta"><span>广告 · 视频 18:45</span><span>2天前</span></div>
+        </div>
+      </div>
+      <div class="learn-item" onclick="navigateTo('page-content-detail')">
+        <img src="assets/article3.jpg" style="height:100px;" alt="content">
+        <div class="learn-item__body">
+          <div class="learn-item__title">WFS入仓注意事项和常见问题</div>
+          <div class="learn-item__meta"><span>物流</span><span>3天前</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 3: 活动 (Tab3) ========== -->
+<div class="page" id="page-activity">
+  <div class="nav-bar">活动中心</div>
+  <div class="calendar-header">
+    <span class="arrow" onclick="prevMonth()">‹</span>
+    <span class="month-text" id="calendarMonth">2026年7月</span>
+    <span class="arrow" onclick="nextMonth()">›</span>
+  </div>
+  <div class="calendar-grid" id="calendarGrid">
+    <div class="calendar-weekday">日</div><div class="calendar-weekday">一</div><div class="calendar-weekday">二</div><div class="calendar-weekday">三</div><div class="calendar-weekday">四</div><div class="calendar-weekday">五</div><div class="calendar-weekday">六</div>
+  </div>
+  <div style="padding:8px 12px;font-size:13px;font-weight:600;color:var(--text);">近期活动</div>
+  <div class="activity-card" onclick="navigateTo('page-activity-detail')">
+    <img src="assets/activity1.jpg" alt="activity">
+    <div class="activity-card__body">
+      <div class="activity-card__title">2026沃尔玛卖家峰会</div>
+      <div class="activity-card__info"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>2026-07-20 09:00-17:00</div>
+      <div class="activity-card__info"><span class="ic"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>上海浦东香格里拉</div>
+      <span class="activity-card__status ongoing">报名中</span>
+    </div>
+  </div>
+  <div class="activity-card" onclick="navigateTo('page-activity-detail')">
+    <img src="assets/activity2.jpg" alt="activity">
+    <div class="activity-card__body">
+      <div class="activity-card__title">新手卖家入门直播课</div>
+      <div class="activity-card__info"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>2026-07-22 14:00-15:30</div>
+      <div class="activity-card__info"><span class="ic"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>线上腾讯会议</div>
+      <span class="activity-card__status ongoing">报名中</span>
+    </div>
+  </div>
+  <div class="activity-card" onclick="navigateTo('page-activity-detail')">
+    <img src="assets/activity3.jpg" alt="activity">
+    <div class="activity-card__body">
+      <div class="activity-card__title">Q3选品趋势分享会</div>
+      <div class="activity-card__info"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>2026-07-25 10:00-11:30</div>
+      <div class="activity-card__info"><span class="ic"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>线上</div>
+      <span class="activity-card__status ongoing">报名中</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 4: 我的 (Tab4) ========== -->
+<div class="page" id="page-mine">
+  <div class="mine-header">
+    <div class="mine-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    <div class="mine-name">张三</div>
+    <div class="mine-level">Level 2 · 高潜卖家</div>
+  </div>
+  <div class="mine-stats">
+    <div class="stat-item"><div class="stat-value">25</div><div class="stat-label">今日学习(分)</div></div>
+    <div class="stat-item"><div class="stat-value">3.5</div><div class="stat-label">本周(小时)</div></div>
+    <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">已完成课程</div></div>
+  </div>
+  <div class="func-list">
+    <div class="func-item" onclick="navigateTo('page-register-progress')">
+      <span class="func-item__icon fi-blue"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg></span><span class="func-item__name">入驻进度</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="navigateTo('page-growth')">
+      <span class="func-item__icon fi-violet"><svg viewBox="0 0 24 24"><path d="M6 9l6-6 6 6"/><path d="M12 3v14"/><path d="M3 17l3 4h12l3-4"/></svg></span><span class="func-item__name">成长中心</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="navigateTo('page-growth')">
+      <span class="func-item__icon fi-teal"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span class="func-item__name">我的课程</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="openManagerModal()">
+      <span class="func-item__icon fi-violet"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="func-item__name">我的客户经理</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="navigateTo('page-messages')">
+      <span class="func-item__icon fi-amber"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span><span class="func-item__name">消息通知</span><span class="func-item__badge">3</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="showToast('敬请期待')">
+      <span class="func-item__icon fi-slate"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span class="func-item__name">设置</span><span class="func-item__arrow">›</span>
+    </div>
+  </div>
+  <div class="func-list" style="margin-top:12px;">
+    <div class="func-item" onclick="switchTab(2)">
+      <span class="func-item__icon fi-amber"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M10 14l2 2 4-4"/></svg></span><span class="func-item__name">我的活动报名</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="showToast('敬请期待')">
+      <span class="func-item__icon fi-rose"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></span><span class="func-item__name">我的收藏</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="showToast('敬请期待')">
+      <span class="func-item__icon fi-emerald"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span><span class="func-item__name">问题反馈</span><span class="func-item__arrow">›</span>
+    </div>
+    <div class="func-item" onclick="showToast('敬请期待')">
+      <span class="func-item__icon fi-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="func-item__name">关于我们</span><span class="func-item__arrow">›</span>
+    </div>
+  </div>
+  <div style="height:20px;"></div>
+</div>
+
+<!-- ========== PAGE 5: 入驻申请 ========== -->
+<div class="page sub-page" id="page-register" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>入驻申请</div>
+
+  <!-- Site Selection Step -->
+  <div class="site-select" id="siteSelectPanel">
+    <div class="site-select__title">选择入驻站点</div>
+    <div class="site-select__desc">请先选择您要入驻的沃尔玛站点，不同站点入驻条件有所不同</div>
+
+    <div class="site-select-card" onclick="selectSite('us')">
+      <div class="site-select-card__header">
+        <span class="site-select-card__flag">🇺🇸</span>
+        <span class="site-select-card__name">美国站</span>
+        <span class="site-select-card__badge hot">最热门</span>
+      </div>
+      <div class="site-select-card__info">全美第二大电商平台，每周 1.5 亿消费者，新卖家最高享 75,000 美元优惠。零年费零月租，全品类开放。</div>
+      <div class="site-select-card__req"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>中国内地/香港企业营业执照 + 跨境电商履约能力</div>
+    </div>
+
+    <div class="site-select-card" onclick="selectSite('ca')">
+      <div class="site-select-card__header">
+        <span class="site-select-card__flag">🇨🇦</span>
+        <span class="site-select-card__name">加拿大站</span>
+        <span class="site-select-card__badge grow">增长快</span>
+      </div>
+      <div class="site-select-card__info">月独立访客 2,500 万，连续 3 年两位数增长，竞争蓝海市场。零年费零月租。</div>
+      <div class="site-select-card__req"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>需已入驻美国站并激活 90 天以上，且业绩表现良好</div>
+    </div>
+
+    <div class="site-select-card" onclick="selectSite('mx')">
+      <div class="site-select-card__header">
+        <span class="site-select-card__flag">🇲🇽</span>
+        <span class="site-select-card__name">墨西哥站</span>
+        <span class="site-select-card__badge new">新兴市场</span>
+      </div>
+      <div class="site-select-card__info">3,000+ 线下门店，年销售增长 20%，一个 Listing 多站同步销售。</div>
+      <div class="site-select-card__req"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>定向邀请制，需已入驻美国站</div>
+    </div>
+  </div>
+
+  <!-- Form area (hidden until site selected) -->
+  <div id="registerFormArea" style="display:none;">
+  <!-- Draft status bar -->
+  <div class="draft-bar" id="draftBar" style="display:none;">
+    <div class="draft-bar__left">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+      <span id="draftStatusText">草稿已保存</span>
+    </div>
+    <div class="draft-bar__right">
+      <span id="draftTime"></span>
+      <span class="draft-bar__clear" onclick="clearDraft()">清除</span>
+    </div>
+  </div>
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-item active"><div class="step-circle">1</div><div class="step-label">企业信息</div><div class="step-line"></div></div>
+    <div class="step-item"><div class="step-circle">2</div><div class="step-label">品牌资质</div><div class="step-line"></div></div>
+    <div class="step-item"><div class="step-circle">3</div><div class="step-label">联系人</div><div class="step-line"></div></div>
+    <div class="step-item"><div class="step-circle">4</div><div class="step-label">确认提交</div></div>
+  </div>
+  <div id="registerForms">
+    <!-- Dynamically rendered based on selected site -->
+  </div>
+  <div class="form-btns">
+    <button class="btn btn-outline" id="prevStepBtn" onclick="prevStep()" style="display:none;">上一步</button>
+    <button class="btn btn-primary" id="nextStepBtn" onclick="nextStep()">下一步</button>
+  </div>
+  </div><!-- /registerFormArea -->
+</div>
+
+<!-- ========== PAGE 6: 入驻指引 ========== -->
+<div class="page sub-page" id="page-register-guide" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>入驻指引</div>
+
+  <!-- Site Introductions -->
+  <div class="site-section">
+    <div class="site-section__title">可入驻站点</div>
+
+    <!-- US -->
+    <div class="site-card" onclick="showToast('美国站入驻申请')">
+      <div class="site-card__header">
+        <div class="site-card__flag">🇺🇸</div>
+        <div class="site-card__meta">
+          <span class="site-card__name">美国站 · US Marketplace</span>
+          <span class="site-card__url">walmart.com</span>
+        </div>
+        <span class="site-card__badge">热门</span>
+      </div>
+      <div class="site-card__body">
+        <div class="site-card__desc">持久强势，美国站邀您一起乘势而上。全渠道优势触达数百万忠诚消费者，无需支付开店费用或月租费用，平台提供有竞争力的佣金政策。新卖家最高享 75,000 美元优惠（2026.2-2027.1 上线新卖家）。</div>
+        <div class="site-card__stats">
+          <span class="site-stat"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>每周 1.5 亿消费者</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>Q4 电商增长 27%</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>4,600+ 门店</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>连续 15 季两位数增长</span>
+        </div>
+        <div class="site-card__tags">
+          <span class="site-tag">0 年费/月租</span>
+          <span class="site-tag">新卖家激励</span>
+          <span class="site-tag">WFS 官方仓配</span>
+          <span class="site-tag">全品类开放</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CA -->
+    <div class="site-card" onclick="showToast('加拿大站入驻申请')">
+      <div class="site-card__header">
+        <div class="site-card__flag">🇨🇦</div>
+        <div class="site-card__meta">
+          <span class="site-card__name">加拿大站 · CA Marketplace</span>
+          <span class="site-card__url">walmart.ca</span>
+        </div>
+        <span class="site-card__badge">增长快</span>
+      </div>
+      <div class="site-card__body">
+        <div class="site-card__desc">潜力市场，带您一起持续增长。海量优质曝光助推销售攀升，加拿大站网站访问量呈指数式增长。无需支付开店费用或月租费用，已入驻美国站并激活 90 天以上、业绩表现良好的卖家即可申请。</div>
+        <div class="site-card__stats">
+          <span class="site-stat"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>月独立访客 2,500 万</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>连续 3 年两位数增长</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>黑五 GMV 增长 115%+</span>
+        </div>
+        <div class="site-card__tags">
+          <span class="site-tag">需先开通美国站</span>
+          <span class="site-tag">0 年费/月租</span>
+          <span class="site-tag">竞争蓝海</span>
+          <span class="site-tag">一站式电商平台</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MX -->
+    <div class="site-card" onclick="showToast('墨西哥站入驻申请')">
+      <div class="site-card__header">
+        <div class="site-card__flag">🇲🇽</div>
+        <div class="site-card__meta">
+          <span class="site-card__name">墨西哥站 · MX Marketplace</span>
+          <span class="site-card__url">walmart.com.mx</span>
+        </div>
+        <span class="site-card__badge">新兴市场</span>
+      </div>
+      <div class="site-card__body">
+        <div class="site-card__desc">高速增长的新兴平台，极具潜力的跨境蓝海市场。本地团队提供招商入驻、品类运营、物流管理、广告营销等一站式服务。一个 Listing 可同步在 walmart.com.mx 和 bodegaaurrera.com.mx 多站销售。定向邀请制，需已入驻美国站。</div>
+        <div class="site-card__stats">
+          <span class="site-stat"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>3,000+ 线下门店</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>年销售增长 20%</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 00-8 0v2"/></svg>SKU 增长 60%</span>
+          <span class="site-stat"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>卖家增长 50%</span>
+        </div>
+        <div class="site-card__tags">
+          <span class="site-tag">定向邀请制</span>
+          <span class="site-tag">WFS + WRF 物流</span>
+          <span class="site-tag">Walmart Connect 广告</span>
+          <span class="site-tag">多站同步</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="guide-flow">
+    <div style="font-size:15px;font-weight:600;margin-bottom:14px;">入驻流程</div>
+    <div class="flow-step"><span class="flow-num">1</span><div><div class="flow-title">准备材料</div><div class="flow-desc">营业执照、品牌授权书等</div></div></div>
+    <div class="flow-step"><span class="flow-num">2</span><div><div class="flow-title">提交申请</div><div class="flow-desc">填写入驻表单，上传资质文件</div></div></div>
+    <div class="flow-step"><span class="flow-num">3</span><div><div class="flow-title">等待审核</div><div class="flow-desc">通常3-5个工作日完成审核</div></div></div>
+    <div class="flow-step"><span class="flow-num">4</span><div><div class="flow-title">绑定PID</div><div class="flow-desc">审核通过后绑定店铺Partner ID</div></div></div>
+    <div class="flow-step"><span class="flow-num">5</span><div><div class="flow-title">开始运营</div><div class="flow-desc">上架商品，正式开始销售</div></div></div>
+  </div>
+  <div class="material-list">
+    <div style="font-size:15px;font-weight:600;margin-bottom:10px;">所需材料</div>
+    <div class="material-item">企业营业执照（统一社会信用代码）</div>
+    <div class="material-item">法人身份证正反面照片</div>
+    <div class="material-item">品牌商标注册证 / 授权书</div>
+    <div class="material-item">跨境电商经验证明（店铺截图）</div>
+    <div class="material-item">产品合规证书（如适用）</div>
+    <div class="material-item">企业银行账户信息</div>
+  </div>
+  <div class="faq-section">
+    <div style="font-size:15px;font-weight:600;margin-bottom:10px;padding:0 4px;">常见问题</div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">入驻沃尔玛需要多长时间？</div><div class="faq-a">从提交申请到审核通过，通常需要3-5个工作日。材料齐全且合规的情况下可能更快。建议提前准备好所有材料。</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">个人可以入驻吗？</div><div class="faq-a">目前沃尔玛Marketplace仅接受企业卖家入驻，需要提供有效的企业营业执照和相关资质证明。</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">入驻费用是多少？</div><div class="faq-a">沃尔玛入驻不收取年费或入驻费，仅按订单收取佣金。佣金比例因类目而异，一般在8%-15%之间。</div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">审核不通过怎么办？</div><div class="faq-a">如审核未通过，系统会告知具体原因。您可以根据反馈修改资料后重新提交。也可以联系专属招商经理获取指导。</div></div>
+  </div>
+  <div style="padding:16px;">
+    <button class="btn btn-primary" onclick="navigateTo('page-register')" style="width:100%;">立即申请入驻</button>
+  </div>
+</div>
+
+<!-- ========== PAGE 7: 入驻进度 ========== -->
+<div class="page sub-page" id="page-register-progress" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>入驻进度</div>
+  <div class="progress-nodes">
+    <div class="p-node done"><div class="p-node__circle">✓</div><div class="p-node__label">提交申请</div></div>
+    <div class="p-line done"></div>
+    <div class="p-node active"><div class="p-node__circle">2</div><div class="p-node__label">审核中</div></div>
+    <div class="p-line"></div>
+    <div class="p-node"><div class="p-node__circle">3</div><div class="p-node__label">绑定PID</div></div>
+  </div>
+  <div style="margin:12px;padding:16px;background:#fff;border-radius:10px;">
+    <div style="font-size:14px;font-weight:600;margin-bottom:8px;">当前状态：审核中</div>
+    <p style="font-size:12px;color:var(--text-sec);line-height:1.8;">您的申请已提交，预计3-5个工作日内完成审核。审核通过后将通过短信和站内消息通知您进行下一步操作。</p>
+    <p style="font-size:12px;color:var(--text-sec);margin-top:8px;">提交时间：2026-07-18 14:30</p>
+    <p style="font-size:12px;color:var(--text-sec);">预计完成：2026-07-23</p>
+  </div>
+  <div class="pid-section">
+    <div style="font-size:14px;font-weight:600;margin-bottom:4px;">PID绑定</div>
+    <p style="font-size:12px;color:var(--text-sec);margin-bottom:10px;">审核通过后，请在此绑定您的店铺Partner ID</p>
+    <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:8px;padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#D97706;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+      <span style="font-size:12px;color:#92400E;font-weight:500;">绑定PID，即刻获取课程大礼包</span>
+    </div>
+    <div class="pid-input-row">
+      <input class="form-input" placeholder="请输入PID">
+      <button class="btn btn-primary" style="flex:0 0 70px;height:40px;font-size:13px;" onclick="showToast('审核通过后方可绑定')">绑定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 8: 成长中心 ========== -->
+<div class="page sub-page" id="page-growth" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>成长中心</div>
+  <div class="growth-header">
+    <div class="growth-level">Level 2</div>
+    <div class="growth-title">高潜卖家</div>
+    <div class="growth-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width:65%;"></div></div>
+      <div class="progress-text">65/100 经验值</div>
+    </div>
+  </div>
+  <div class="growth-stats">
+    <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">已完成课程</div></div>
+    <div class="stat-item"><div class="stat-value">48h</div><div class="stat-label">累计学习</div></div>
+    <div class="stat-item"><div class="stat-value">80%</div><div class="stat-label">完成率</div></div>
+  </div>
+  <div class="growth-tabs">
+    <div class="growth-tab active" onclick="switchGrowthTab(this,'required')">必修课程</div>
+    <div class="growth-tab" onclick="switchGrowthTab(this,'optional')">选修课程</div>
+  </div>
+  <div class="growth-list" id="growthList">
+    <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course1.jpg"><div class="growth-item__info"><div class="growth-item__title">入驻准备指南：从0到1开店</div><div class="growth-item__progress">进度 8/10章</div></div></div>
+    <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course2.jpg"><div class="growth-item__info"><div class="growth-item__title">店铺设置与品牌打造</div><div class="growth-item__progress">进度 8/8章 ✅</div></div></div>
+    <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course3.jpg"><div class="growth-item__info"><div class="growth-item__title">首批商品上架攻略</div><div class="growth-item__progress">进度 5/12章</div></div></div>
+    <div class="growth-item locked" onclick="showToast('升级到Level 3后解锁')"><img src="assets/course4.jpg"><div class="growth-item__info"><div class="growth-item__title">广告投放与流量运营</div><div class="growth-item__progress"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Level 3 解锁</div></div><span class="growth-item__lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
+    <div class="growth-item locked" onclick="showToast('升级到Level 3后解锁')"><img src="assets/course5.jpg"><div class="growth-item__info"><div class="growth-item__title">高阶运营：爆款打造</div><div class="growth-item__progress"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Level 3 解锁</div></div><span class="growth-item__lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
+  </div>
+</div>
+
+<!-- ========== PAGE 9: 佣金计算器 ========== -->
+<div class="page sub-page" id="page-calculator" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>佣金计算器</div>
+  <div class="calc-section">
+    <div style="font-size:15px;font-weight:600;margin-bottom:12px;">选择站点和类目</div>
+    <select class="calc-select" id="calcSite" onchange="onSiteChange()">
+      <option value="">请选择站点</option>
+      <option value="US">US (美国)</option>
+      <option value="CA">CA (加拿大)</option>
+      <option value="MX">MX (墨西哥)</option>
+    </select>
+    <select class="calc-select" id="calcCategory" onchange="onCategoryChange()">
+      <option value="">请先选择站点</option>
+    </select>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="calcBtn" onclick="doCalculate()">计算佣金</button>
+  </div>
+  <div class="calc-result" id="calcResult" style="display:none;">
+    <div style="font-size:13px;color:var(--text-sec);margin-bottom:4px;">参考佣金比例</div>
+    <div class="calc-rate" id="calcRate">--</div>
+    <div class="calc-detail" id="calcDetail"></div>
+  </div>
+  <div class="incentive-tip" id="incentiveTip" style="display:none;">
+    <span class="ic-bulb"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 00-4 12.7V17h8v-2.3A7 7 0 0012 2z"/></svg></span>
+    <span id="incentiveText"></span>
+  </div>
+  <div style="margin:16px 12px;padding:14px;background:#fff;border-radius:10px;">
+    <div style="font-size:13px;font-weight:500;margin-bottom:6px;display:flex;align-items:center;gap:4px;"><span class="ic-tip"><svg viewBox="0 0 24 24" style="stroke:#4F46E5;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></span>温馨提示</div>
+    <p style="font-size:12px;color:var(--text-sec);line-height:1.6;">佣金比例仅供参考，实际费率以沃尔玛官方最新政策为准。部分类目在特定季度可能享有佣金减免优惠。</p>
+  </div>
+</div>
+
+<!-- ========== PAGE 10: AI对话 ========== -->
+<div class="page sub-page" id="page-ai" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>AI助手</div>
+  <div class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-bubble ai">
+        <div class="bubble-content">你好！我是沃尔玛AI助手，有什么可以帮你的？
+          <div class="quick-chips">
+            <button class="quick-chip" onclick="sendQuickQ(this)">如何入驻沃尔玛？</button>
+            <button class="quick-chip" onclick="sendQuickQ(this)">佣金政策是什么？</button>
+            <button class="quick-chip" onclick="sendQuickQ(this)">如何优化Listing？</button>
+            <button class="quick-chip" onclick="sendQuickQ(this)">物流方案推荐</button>
+          </div>
+        </div>
+      </div>
+      <div class="chat-bubble user">
+        <div class="bubble-content">如何入驻沃尔玛？</div>
+      </div>
+      <div class="chat-bubble ai">
+        <div class="bubble-content">沃尔玛入驻流程分为以下几步：
+
+1. 准备材料：营业执照、品牌授权书等
+2. 提交申请：通过本小程序填写入驻表单
+3. 等待审核：通常3-5个工作日
+4. 绑定PID：审核通过后绑定店铺ID
+5. 开始运营：正式上架商品开始销售
+
+需要了解更多细节吗？</div>
+      </div>
+      <div class="chat-bubble user">
+        <div class="bubble-content">佣金政策是什么？</div>
+      </div>
+      <div class="chat-bubble ai">
+        <div class="bubble-content">沃尔玛的佣金根据商品分类不同而不同：
+
+• 电子产品：8.5%
+• 服装：15%
+• 家居：12%
+• 美妆：10%
+
+建议使用佣金计算器获取精确费率。Q3部分类目有佣金减免活动！</div>
+      </div>
+    </div>
+    <div class="chat-input-bar">
+      <input class="chat-input" id="chatInput" placeholder="输入你的问题..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="chat-send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 11: 活动详情 ========== -->
+<div class="page sub-page" id="page-activity-detail" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>活动详情</div>
+  <img class="detail-cover" src="assets/activity1.jpg" alt="cover">
+  <div class="detail-info">
+    <div class="detail-title">2026沃尔玛卖家峰会</div>
+    <div class="detail-meta">
+      <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>时间：2026年7月20日 09:00-17:00<br>
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>地点：上海浦东香格里拉酒店<br>
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span>已报名：256人<br>
+      <span class="ic"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1"/></svg></span>类型：线下峰会
+    </div>
+  </div>
+  <div class="detail-tabs">
+    <div class="detail-tab active" onclick="switchDetailTab(this,'detail-panel-1')">活动详情</div>
+    <div class="detail-tab" onclick="switchDetailTab(this,'detail-panel-2')">活动议程</div>
+    <div class="detail-tab" onclick="switchDetailTab(this,'detail-panel-3')">嘉宾介绍</div>
+    <div class="detail-tab" onclick="switchDetailTab(this,'detail-panel-4')">我的邀约</div>
+  </div>
+  <div class="detail-content" id="detail-panel-1">
+    <p><strong>活动介绍</strong></p>
+    <p>2026沃尔玛卖家峰会是年度最重要的卖家交流盛会，汇聚行业专家、资深卖家、沃尔玛官方团队，共同分享跨境电商最新趋势、运营策略和平台政策。</p>
+    <p><strong>你将获得</strong></p>
+    <p>• 最新平台政策解读和Q3-Q4战略规划<br>• 爆款打造实战案例分享<br>• 物流成本优化方案<br>• 与官方招商团队面对面交流<br>• 卖家社交晚宴</p>
+  </div>
+  <div class="detail-content" id="detail-panel-2" style="display:none;">
+    <p><strong>上午场</strong></p>
+    <p>09:00-09:30 签到入场<br>09:30-10:30 开幕致辞与平台战略分享<br>10:30-11:30 Q3-Q4品类趋势发布<br>11:30-12:00 圆桌对话</p>
+    <p><strong>下午场</strong></p>
+    <p>13:30-14:30 广告投放实战工作坊<br>14:30-15:30 物流优化方案分享<br>15:30-16:30 爆款案例拆解<br>16:30-17:00 Q&A互动</p>
+  </div>
+  <div class="detail-content" id="detail-panel-3" style="display:none;">
+    <p><strong>主讲嘉宾</strong></p>
+    <p><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></span> <strong>John Smith</strong> - Walmart Marketplace VP<br>负责全球跨境卖家战略规划</p>
+    <p><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></span> <strong>李明</strong> - 沃尔玛中国区招商总监<br>10年跨境电商行业经验</p>
+    <p><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></span> <strong>王芳</strong> - TOP卖家代表<br>年销售额超5000万，擅长选品与广告优化</p>
+  </div>
+  <div class="detail-content" id="detail-panel-4" style="display:none;">
+    <div class="invite-list">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px;">
+        <span style="font-size:13px;font-weight:500;white-space:nowrap;">已邀请 3 人</span>
+        <button class="btn btn-outline" style="height:32px;font-size:12px;padding:0 16px;flex:0 0 auto;" onclick="openShareSheet()">邀请更多</button>
+      </div>
+      <div class="invite-item">
+        <div class="invite-item__avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="invite-item__info"><div class="invite-item__name">李思远</div><div class="invite-item__time">07-19 邀请</div></div>
+        <span class="invite-item__status accepted">已报名</span>
+      </div>
+      <div class="invite-item">
+        <div class="invite-item__avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="invite-item__info"><div class="invite-item__name">王建国</div><div class="invite-item__time">07-20 邀请</div></div>
+        <span class="invite-item__status pending">未报名</span>
+      </div>
+      <div class="invite-item">
+        <div class="invite-item__avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="invite-item__info"><div class="invite-item__name">赵敏</div><div class="invite-item__time">07-20 邀请</div></div>
+        <span class="invite-item__status rejected">待审核</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-bottom-btn">
+    <button class="btn btn-outline" onclick="openShareSheet()"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
+    <button class="btn btn-primary" id="activityActionBtn" onclick="handleActivityAction()">立即报名</button>
+  </div>
+
+  <!-- Punch Card Section -->
+  <div class="punch-section" style="margin-bottom:80px;">
+    <div class="punch-section__title">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      活动现场打卡
+    </div>
+    <div class="punch-grid">
+      <div class="punch-point" id="punch-1" onclick="doPunch('punch-1','签到区')">
+        <div class="punch-point__icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17,11 19,13 23,9"/></svg></div>
+        <div class="punch-point__name">签到区</div>
+        <button class="punch-point__btn">打卡</button>
+      </div>
+      <div class="punch-point" id="punch-2" onclick="doPunch('punch-2','主会场')">
+        <div class="punch-point__icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></div>
+        <div class="punch-point__name">主会场</div>
+        <button class="punch-point__btn">打卡</button>
+      </div>
+      <div class="punch-point" id="punch-3" onclick="doPunch('punch-3','展览区')">
+        <div class="punch-point__icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="punch-point__name">展览区</div>
+        <button class="punch-point__btn">打卡</button>
+      </div>
+      <div class="punch-point" id="punch-4" onclick="doPunch('punch-4','茶歇区')">
+        <div class="punch-point__icon"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+        <div class="punch-point__name">茶歇区</div>
+        <button class="punch-point__btn">打卡</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 12: 签到 ========== -->
+<div class="page sub-page" id="page-checkin" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>活动签到</div>
+  <div class="checkin-page">
+    <!-- Scanner state -->
+    <div id="checkinScanner">
+      <div style="text-align:center;margin-bottom:16px;font-size:14px;font-weight:500;">扫描活动签到码</div>
+      <div class="scanner-area">
+        <div class="scanner-corners"></div>
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="19" width="2" height="2"/></svg>
+      </div>
+      <p style="text-align:center;font-size:12px;color:var(--text-sec);margin:12px 0;">请将摄像头对准活动现场的签到二维码</p>
+      <div style="text-align:center;"><button class="btn btn-primary" style="width:200px;" onclick="simulateCheckin()">模拟扫码签到</button></div>
+    </div>
+    <!-- Success state -->
+    <div id="checkinSuccess" style="display:none;">
+      <div class="checkin-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div class="checkin-title">签到成功！</div>
+      <div class="checkin-desc">恭喜你完成本次活动签到，已获得10经验值奖励</div>
+      <button class="btn btn-primary" style="width:200px;" onclick="navigateTo('page-activity-detail')">查看活动详情</button>
+      <button class="btn btn-outline" style="width:200px;margin-top:10px;" onclick="switchTab(0)">返回首页</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 13: 消息通知 ========== -->
+<div class="page sub-page" id="page-messages" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>消息通知</div>
+  <div class="msg-tabs">
+    <div class="msg-tab active" onclick="switchMsgTab(this)">全部</div>
+    <div class="msg-tab" onclick="switchMsgTab(this)">学习</div>
+    <div class="msg-tab" onclick="switchMsgTab(this)">活动</div>
+    <div class="msg-tab" onclick="switchMsgTab(this)">系统</div>
+  </div>
+  <div class="msg-list">
+    <div class="msg-item" onclick="navigateTo('page-content-detail')">
+      <div class="msg-dot"></div>
+      <div class="msg-item__content">
+        <div class="msg-item__title">入驻审核进度更新</div>
+        <div class="msg-item__desc">您的入驻申请已进入审核阶段，预计3-5个工作日内完成</div>
+        <div class="msg-item__time">今天 10:30</div>
+      </div>
+    </div>
+    <div class="msg-item" onclick="navigateTo('page-content-detail')">
+      <div class="msg-dot"></div>
+      <div class="msg-item__content">
+        <div class="msg-item__title">新课程上线通知</div>
+        <div class="msg-item__desc">《广告投放ROI优化实战》课程已上线，立即学习</div>
+        <div class="msg-item__time">今天 09:15</div>
+      </div>
+    </div>
+    <div class="msg-item" onclick="navigateTo('page-content-detail')">
+      <div class="msg-dot"></div>
+      <div class="msg-item__content">
+        <div class="msg-item__title">活动报名成功</div>
+        <div class="msg-item__desc">您已成功报名「2026沃尔玛卖家峰会」，请准时参加</div>
+        <div class="msg-item__time">昨天 16:20</div>
+      </div>
+    </div>
+    <div class="msg-item" onclick="navigateTo('page-content-detail')">
+      <div class="msg-dot read"></div>
+      <div class="msg-item__content">
+        <div class="msg-item__title">学习提醒</div>
+        <div class="msg-item__desc">你已经3天没学习了，快来完成今日课程吧</div>
+        <div class="msg-item__time">2天前</div>
+      </div>
+    </div>
+    <div class="msg-item" onclick="navigateTo('page-content-detail')">
+      <div class="msg-dot read"></div>
+      <div class="msg-item__content">
+        <div class="msg-item__title">系统维护通知</div>
+        <div class="msg-item__desc">平台将于7月25日凌晨2:00-4:00进行系统升级维护</div>
+        <div class="msg-item__time">3天前</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 14: 搜索 ========== -->
+<div class="page sub-page" id="page-search" style="display:none;">
+  <div class="nav-bar nav-bar-white" style="padding:0;">
+    <div class="search-page-bar" style="width:100%;">
+      <input id="searchInput" placeholder="搜索课程、文章、活动..." autofocus>
+      <span class="cancel" onclick="goBack()">取消</span>
+    </div>
+  </div>
+  <div class="hot-tags">
+    <div class="hot-tags__title"><span class="ic-tip"><svg viewBox="0 0 24 24" style="stroke:#EF4444;"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.07-2.14-2-3.5-2-5.5A7.5 7.5 0 0118 7c0 2.52-2.5 4.5-4 6.5-1.5 2-1.5 3-1.5 4.5"/><path d="M12 22a7 7 0 004-5.5c0-2-1-3-2-4"/></svg></span>热门搜索</div>
+    <div class="hot-tags__list">
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">入驻流程</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">佣金计算</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">Listing优化</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">物流方案</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">广告投放</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">Q3政策</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">选品趋势</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">WFS入仓</span>
+    </div>
+  </div>
+  <div class="hot-tags">
+    <div class="hot-tags__title"><span class="ic-tip"><svg viewBox="0 0 24 24" style="stroke:#6B7280;"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></span>搜索历史</div>
+    <div class="hot-tags__list">
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">沃尔玛入驻条件</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">佣金减免</span>
+      <span class="hot-tag" onclick="navigateTo('page-content-detail')">广告ROI</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 15: 内容详情 ========== -->
+<div class="page sub-page" id="page-content-detail" style="display:none;">
+  <div class="nav-bar"><span class="back-btn" onclick="goBack()">←</span>详情</div>
+  <div class="content-detail">
+    <div class="content-detail__title">2026年Q3沃尔玛招商政策更新</div>
+    <div class="content-detail__meta">发布时间：2026-07-20 &nbsp;|&nbsp; 阅读 1.2k</div>
+    <div class="content-detail__body">
+      <p>沃尔玛近日发布了2026年第三季度最新招商政策，涉及佣金调整、新卖家激励、物流补贴等多个方面。以下为核心内容解读：</p>
+      <p><strong>一、佣金优惠政策</strong></p>
+      <p>Q3期间，电子产品类目佣金从8.5%下调至6.5%，服装类目新卖家前90天享受5%优惠费率。此举旨在吸引更多优质卖家入驻。</p>
+      <p><strong>二、新卖家激励计划</strong></p>
+      <p>新入驻卖家在首个季度内达到以下目标可获得额外奖励：<br>• 上架50+SKU：获得$500广告金<br>• 月销售额突破$10,000：佣金额外减免1%<br>• 完成Perfect Launch四项指标：获得流量加权</p>
+      <p><strong>三、WFS物流补贴</strong></p>
+      <p>使用WFS(Walmart Fulfillment Services)的卖家，Q3期间首批入仓免收入库费，且享受配送费8折优惠。建议卖家尽早规划Q3-Q4旺季备货。</p>
+      <p><strong>四、合规要求更新</strong></p>
+      <p>平台加强了对商品合规的审核力度，特别是电子产品需提供FCC认证、UL认证等。建议卖家提前准备相关证书，避免上架延误。</p>
+    </div>
+  </div>
+  <div class="content-bottom-bar">
+    <div class="action-btn" onclick="showToast('已点赞')"><span class="ic"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg></span>有用 128</div>
+    <div class="action-btn" onclick="showToast('已收藏')"><span class="ic"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></span>收藏</div>
+    <div class="action-btn" onclick="showToast('分享链接已复制')"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>分享</div>
+  </div>
+</div>
+
+<!-- ========== TabBar ========== -->
+<div class="tab-bar" id="tabBar">
+  <div class="tab-item active" onclick="switchTab(0)">
+    <span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span><span>首页</span>
+  </div>
+  <div class="tab-item" onclick="switchTab(1)">
+    <span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></span><span>卖家大学</span>
+  </div>
+  <div class="tab-item" onclick="switchTab(2)">
+    <span class="tab-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="2"/></svg></span><span>活动中心</span>
+  </div>
+  <div class="tab-item" onclick="switchTab(3)">
+    <span class="tab-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>我的</span>
+  </div>
+</div>
+
+<!-- Manager Modal -->
+<div class="reg-modal" id="managerModal">
+  <div class="reg-modal__box">
+    <button class="reg-modal__close" onclick="closeManagerModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="reg-modal__title">我的客户经理</div>
+    <div class="reg-modal__desc">添加您的专属客户经理企业微信，获取一对一入驻指导和运营支持</div>
+    <div class="reg-modal__qr" style="border:none;background:transparent;padding:0;"><img src="assets/manager-qr.png" style="width:180px;height:180px;border-radius:8px;object-fit:cover;"></div>
+    <div style="font-size:13px;color:var(--text-sec);margin-bottom:4px;">赵晓雅 · 高级招商经理</div>
+    <div style="font-size:12px;color:var(--text-third);margin-bottom:16px;">长按识别二维码添加</div>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeManagerModal()">我知道了</button>
+  </div>
+</div>
+
+<!-- Registration Modal -->
+<div class="reg-modal" id="regModal">
+  <div class="reg-modal__box">
+    <button class="reg-modal__close" onclick="closeRegModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="reg-modal__step active" id="regStep1">
+      <div class="reg-modal__title">关注微信服务号</div>
+      <div class="reg-modal__desc">报名活动前，请先关注「沃尔玛全球电商」微信服务号，获取活动通知和审核结果推送。</div>
+      <div class="reg-modal__qr" style="border:none;background:transparent;padding:0;"><img src="assets/wx-qr.png" style="width:160px;height:160px;border-radius:8px;object-fit:cover;"></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="regNextStep(2)">已关注，下一步</button>
+    </div>
+    <div class="reg-modal__step" id="regStep2">
+      <div class="reg-modal__title">填写报名信息</div>
+      <div class="reg-modal__desc">请填写以下信息，提交后将进入审核流程。</div>
+      <div class="reg-modal__form">
+        <div class="form-group"><label class="form-label">姓名 *</label><input class="form-input" id="regFormName" placeholder="请输入真实姓名"></div>
+        <div class="form-group"><label class="form-label">公司名称 *</label><input class="form-input" id="regFormCompany" placeholder="请输入公司全称"></div>
+        <div class="form-group"><label class="form-label">手机号 *</label><input class="form-input" id="regFormPhone" placeholder="11位手机号码"></div>
+        <div class="form-group"><label class="form-label">邮箱 *</label><input class="form-input" id="regFormEmail" placeholder="接收审核结果通知"></div>
+        <div class="form-group"><label class="form-label">职位角色 *</label><select class="form-input" id="regFormRole"><option value="" disabled selected>请选择</option><option>创始人/CEO</option><option>运营总监/经理</option><option>市场/品牌</option><option>采购/供应链</option><option>其他</option></select></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="submitRegForm()">提交报名</button>
+    </div>
+    <div class="reg-modal__step" id="regStep3">
+      <div class="reg-status">
+        <div class="reg-status__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div>
+        <div class="reg-status__title">报名已提交，等待审核</div>
+        <div class="reg-status__desc">审核结果将在 1-3 个工作日内通过微信服务号和短信通知您。审核通过后方可参加活动。</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="closeRegModal()">我知道了</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Sheet -->
+<div class="share-sheet" id="shareSheet" onclick="closeShareSheet(event)">
+  <div class="share-sheet__box" onclick="event.stopPropagation()">
+    <div class="share-sheet__title">分享活动</div>
+    <div class="share-sheet__grid">
+      <div class="share-item" onclick="shareAction('微信好友')"><div class="share-item__icon wechat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="share-item__name">微信好友</span></div>
+      <div class="share-item" onclick="shareAction('朋友圈')"><div class="share-item__icon moments"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg></div><span class="share-item__name">朋友圈</span></div>
+      <div class="share-item" onclick="shareAction('复制链接')"><div class="share-item__icon link"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div><span class="share-item__name">复制链接</span></div>
+      <div class="share-item" onclick="shareAction('生成海报')"><div class="share-item__icon poster"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div><span class="share-item__name">生成海报</span></div>
+    </div>
+    <div class="share-sheet__cancel" onclick="closeShareSheet()">取消</div>
+  </div>
+</div>
+
+<!-- Smart Fill FAB -->
+<button class="smart-fill-btn" id="smartFillBtn" onclick="openSmartFill()">
+  <svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m-7.07-2.93l.71-.71m12.02-12.02l.71-.71M3 12h1m16 0h1"/><circle cx="12" cy="12" r="4"/><path d="M12 8a4 4 0 014 4"/></svg>
+</button>
+
+<!-- Smart Fill Bottom Sheet -->
+<div class="sf-overlay" id="sfOverlay" onclick="closeSmartFill(event)">
+  <div class="sf-sheet" onclick="event.stopPropagation()">
+    <div class="sf-sheet__header">
+      <span class="sf-sheet__title">智能填充</span>
+      <button class="sf-sheet__close" onclick="closeSmartFill()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="sf-sheet__desc">粘贴营业执照信息、企业简介或联系方式等长文本，AI 将自动识别并填入对应字段。</div>
+    <textarea class="sf-textarea" id="sfTextarea" placeholder="在此粘贴文本内容...&#10;&#10;例如：&#10;企业名称：深圳市xxx科技有限公司&#10;统一社会信用代码：91440300...&#10;注册地址：深圳市南山区..."></textarea>
+    <div class="sf-actions">
+      <button class="btn btn-outline" onclick="pasteFromClipboard()" style="flex:0 0 auto;padding:0 14px;">
+        <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-right:4px;vertical-align:-2px;display:inline-block;"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+        粘贴
+      </button>
+      <button class="btn btn-primary" style="flex:1;" onclick="doSmartFill()">识别并填入</button>
+    </div>
+    <div class="sf-result" id="sfResult"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== Global State =====
+let currentTab = 0;
+let pageHistory = [];
+const tabPages = ['page-home', 'page-learn', 'page-activity', 'page-mine'];
+
+// ===== Tab Switching =====
+function switchTab(index) {
+  currentTab = index;
+  pageHistory = [];
+  // Hide all pages - clear both class and inline styles
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = '';
+  });
+  // Show target tab page
+  document.getElementById(tabPages[index]).classList.add('active');
+  // Update tabbar
+  document.querySelectorAll('.tab-item').forEach((t, i) => {
+    t.classList.toggle('active', i === index);
+  });
+  // Show/hide tabbar
+  document.getElementById('tabBar').style.display = 'flex';
+  updateSmartFillVisibility();
+}
+
+// ===== Page Navigation =====
+function navigateTo(pageId) {
+  pageHistory.push({ tab: currentTab, page: document.querySelector('.page.active')?.id });
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = '';
+  });
+  document.getElementById(pageId).classList.add('active');
+  document.getElementById('tabBar').style.display = 'none';
+  if (pageId === 'page-search') {
+    setTimeout(() => document.getElementById('searchInput')?.focus(), 100);
+  }
+  if (pageId === 'page-activity-detail') {
+    setTimeout(updateActivityActionBtn, 50);
+  }
+  if (pageId === 'page-register') {
+    restoreDraft();
+  }
+  updateSmartFillVisibility();
+}
+
+function goBack() {
+  const prev = pageHistory.pop();
+  // Clear ALL pages: remove active class AND reset inline display styles
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = '';
+  });
+  if (prev && prev.page) {
+    document.getElementById(prev.page).classList.add('active');
+    if (tabPages.includes(prev.page)) {
+      document.getElementById('tabBar').style.display = 'flex';
+    }
+  } else {
+    switchTab(currentTab);
+  }
+  updateSmartFillVisibility();
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== Banner Carousel =====
+let bannerIndex = 0;
+let bannerTimer = null;
+function startBanner() {
+  const track = document.getElementById('bannerTrack');
+  const dots = document.querySelectorAll('#bannerDots .banner-dot');
+  bannerTimer = setInterval(() => {
+    bannerIndex = (bannerIndex + 1) % 3;
+    track.style.transform = `translateX(-${bannerIndex * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === bannerIndex));
+  }, 4000);
+}
+startBanner();
+
+// ===== Calendar =====
+let calYear = 2026, calMonth = 7;
+const activeDays = [10, 15, 17, 20, 22, 25];
+
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const today = new Date();
+  const todayDay = (today.getFullYear() === calYear && today.getMonth() + 1 === calMonth) ? today.getDate() : -1;
+  
+  // Keep weekday headers
+  let html = '<div class="calendar-weekday">日</div><div class="calendar-weekday">一</div><div class="calendar-weekday">二</div><div class="calendar-weekday">三</div><div class="calendar-weekday">四</div><div class="calendar-weekday">五</div><div class="calendar-weekday">六</div>';
+  
+  const firstDay = new Date(calYear, calMonth - 1, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth, 0).getDate();
+  
+  for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day"></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === todayDay;
+    const hasAct = activeDays.includes(d);
+    html += `<div class="calendar-day${isToday ? ' today selected' : ''}" onclick="selectDay(${d})">${d}${hasAct ? '<div class="dot"></div>' : ''}</div>`;
+  }
+  grid.innerHTML = html;
+  document.getElementById('calendarMonth').textContent = `${calYear}年${calMonth}月`;
+}
+
+function selectDay(d) {
+  document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function prevMonth() {
+  if (calMonth === 1) { calMonth = 12; calYear--; } else { calMonth--; }
+  renderCalendar();
+}
+function nextMonth() {
+  if (calMonth === 12) { calMonth = 1; calYear++; } else { calMonth++; }
+  renderCalendar();
+}
+
+// ===== Learn Category =====
+function switchCategory(el) {
+  document.querySelectorAll('#learnSidebar .sidebar-item').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== Growth Tab =====
+const requiredCoursesHTML = `
+  <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course1.jpg"><div class="growth-item__info"><div class="growth-item__title">入驻准备指南：从0到1开店</div><div class="growth-item__progress">进度 8/10章</div></div></div>
+  <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course2.jpg"><div class="growth-item__info"><div class="growth-item__title">店铺设置与品牌打造</div><div class="growth-item__progress">进度 8/8章 ✅</div></div></div>
+  <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course3.jpg"><div class="growth-item__info"><div class="growth-item__title">首批商品上架攻略</div><div class="growth-item__progress">进度 5/12章</div></div></div>
+  <div class="growth-item locked" onclick="showToast('升级到Level 3后解锁')"><img src="assets/course4.jpg"><div class="growth-item__info"><div class="growth-item__title">广告投放与流量运营</div><div class="growth-item__progress"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Level 3 解锁</div></div><span class="growth-item__lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
+  <div class="growth-item locked" onclick="showToast('升级到Level 3后解锁')"><img src="assets/course5.jpg"><div class="growth-item__info"><div class="growth-item__title">高阶运营：爆款打造</div><div class="growth-item__progress"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Level 3 解锁</div></div><span class="growth-item__lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>`;
+
+const optionalCoursesHTML = `
+  <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course6.jpg"><div class="growth-item__info"><div class="growth-item__title">跨境物流模式全解析</div><div class="growth-item__progress">进度 2/6章</div></div></div>
+  <div class="growth-item" onclick="navigateTo('page-content-detail')"><img src="assets/course7.jpg"><div class="growth-item__info"><div class="growth-item__title">沃尔玛平台政策解读</div><div class="growth-item__progress">进度 0/4章</div></div></div>`;
+
+function switchGrowthTab(el, tab) {
+  document.querySelectorAll('.growth-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('growthList').innerHTML = tab === 'required' ? requiredCoursesHTML : optionalCoursesHTML;
+}
+
+// ===== Register Steps =====
+let regStep = 1;
+function getStepCount() {
+  return selectedSite && SITE_FORMS[selectedSite] ? SITE_FORMS[selectedSite].steps.length : 4;
+}
+function nextStep() {
+  const total = getStepCount();
+  if (regStep >= total) { showToast('提交成功！请等待审核'); setTimeout(() => navigateTo('page-register-progress'), 1500); return; }
+  document.querySelector(`.register-step[data-step="${regStep}"]`).style.display = 'none';
+  regStep++;
+  document.querySelector(`.register-step[data-step="${regStep}"]`).style.display = 'block';
+  updateStepUI();
+}
+function prevStep() {
+  if (regStep <= 1) return;
+  document.querySelector(`.register-step[data-step="${regStep}"]`).style.display = 'none';
+  regStep--;
+  document.querySelector(`.register-step[data-step="${regStep}"]`).style.display = 'block';
+  updateStepUI();
+}
+function updateStepUI() {
+  const total = getStepCount();
+  const items = document.querySelectorAll('#stepsBar .step-item');
+  items.forEach((item, i) => {
+    item.classList.remove('active', 'done');
+    if (i + 1 < regStep) item.classList.add('done');
+    else if (i + 1 === regStep) item.classList.add('active');
+  });
+  document.getElementById('prevStepBtn').style.display = regStep > 1 ? 'flex' : 'none';
+  document.getElementById('nextStepBtn').textContent = regStep >= total ? '提交申请' : '下一步';
+}
+
+// ===== FAQ Toggle =====
+function toggleFaq(el) {
+  el.classList.toggle('open');
+}
+
+// ===== Calculator =====
+const siteCategories = {
+  US: [
+    { name: 'Electronics (电子产品)', rate: 8.5, min: '$0.50' },
+    { name: 'Clothing (服装)', rate: 15, min: '$0.50' },
+    { name: 'Home & Garden (家居)', rate: 12, min: '$0.50' },
+    { name: 'Beauty (美妆)', rate: 10, min: '$0.50' },
+    { name: 'Toys & Games (玩具)', rate: 12, min: '$0.50' },
+    { name: 'Sports (运动)', rate: 13, min: '$0.50' }
+  ],
+  CA: [
+    { name: 'Electronics', rate: 9, min: 'CA$0.75' },
+    { name: 'Clothing', rate: 15, min: 'CA$0.75' },
+    { name: 'Home', rate: 12.5, min: 'CA$0.75' }
+  ],
+  MX: [
+    { name: 'Electrónica', rate: 10, min: 'MX$10' },
+    { name: 'Ropa', rate: 16, min: 'MX$10' }
+  ]
+};
+
+function onSiteChange() {
+  const site = document.getElementById('calcSite').value;
+  const catSelect = document.getElementById('calcCategory');
+  catSelect.innerHTML = '<option value="">请选择类目</option>';
+  if (site && siteCategories[site]) {
+    siteCategories[site].forEach((c, i) => {
+      catSelect.innerHTML += `<option value="${i}">${c.name}</option>`;
+    });
+  }
+  document.getElementById('calcResult').style.display = 'none';
+  document.getElementById('incentiveTip').style.display = 'none';
+}
+
+function onCategoryChange() {}
+
+function doCalculate() {
+  const site = document.getElementById('calcSite').value;
+  const catIdx = document.getElementById('calcCategory').value;
+  if (!site || catIdx === '') { showToast('请先选择站点和类目'); return; }
+  
+  const cat = siteCategories[site][parseInt(catIdx)];
+  document.getElementById('calcRate').textContent = cat.rate + '%';
+  document.getElementById('calcDetail').textContent = `站点：${site} | 类目：${cat.name} | 最低收费：${cat.min}`;
+  document.getElementById('calcResult').style.display = 'block';
+  
+  // Check incentive
+  const tip = document.getElementById('incentiveTip');
+  const tipText = document.getElementById('incentiveText');
+  if (catIdx === '0' && site === 'US') {
+    tipText.textContent = '该类目Q3享受佣金减免2%，有效期至2026-09-30。实际佣金比例为 ' + (cat.rate - 2) + '%';
+    tip.style.display = 'flex';
+  } else if (catIdx === '1') {
+    tipText.textContent = '服装类目新卖家前90天享受佣金5%优惠费率';
+    tip.style.display = 'flex';
+  } else {
+    tip.style.display = 'none';
+  }
+}
+
+// ===== AI Chat =====
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  
+  const container = document.getElementById('chatMessages');
+  // Add user bubble
+  container.innerHTML += `<div class="chat-bubble user"><div class="bubble-content">${escapeHtml(text)}</div></div>`;
+  // Add thinking indicator
+  container.innerHTML += `<div class="chat-bubble ai" id="thinking"><div class="thinking-indicator"><span></span><span></span><span></span></div></div>`;
+  container.scrollTop = container.scrollHeight;
+  
+  // Simulate AI response
+  setTimeout(() => {
+    const thinkEl = document.getElementById('thinking');
+    if (thinkEl) thinkEl.remove();
+    const response = getAIResponse(text);
+    container.innerHTML += `<div class="chat-bubble ai"><div class="bubble-content">${response}</div></div>`;
+    container.scrollTop = container.scrollHeight;
+  }, 1500);
+}
+
+function sendQuickQ(el) {
+  document.getElementById('chatInput').value = el.textContent;
+  sendMessage();
+}
+
+function getAIResponse(q) {
+  const responses = {
+    '如何入驻沃尔玛？': '沃尔玛入驻流程分为以下几步：\n\n1. 准备材料：营业执照、品牌授权书等\n2. 提交申请：通过本小程序填写入驻表单\n3. 等待审核：通常3-5个工作日\n4. 绑定PID：审核通过后绑定店铺ID\n5. 开始运营：正式上架商品开始销售\n\n需要了解更多细节吗？',
+    '佣金政策是什么？': '沃尔玛的佣金根据商品分类不同而不同：\n\n• 电子产品：8.5%\n• 服装：15%\n• 家居：12%\n• 美妆：10%\n\n建议使用佣金计算器获取精确费率。Q3部分类目有佣金减免活动！',
+    '如何优化Listing？': 'Listing优化建议：\n\n1. 标题：包含核心关键词，120字符内\n2. 图片：主图白底，至少5张\n3. 描述：突出卖点，使用bullet points\n4. 定价：参考竞品，合理定价\n5. 关键词：用Search Insight工具挖词',
+    '物流方案推荐': '推荐物流方案：\n\n1. WFS(Walmart Fulfillment)：官方仓配，买家信任度高\n2. 海外仓：适合大件商品，时效快\n3. 直邮：适合试水期，成本低但时效慢\n\nQ3使用WFS可享入仓免费+配送费8折！'
+  };
+  return (responses[q] || `这是一个很好的问题！关于"${escapeHtml(q)}"，建议你：\n\n1. 查看知识学堂中的相关文章\n2. 使用佣金计算器了解费率\n3. 参加近期的线上培训活动\n\n还有其他问题吗？`).replace(/\n/g, '\n');
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===== Activity Detail Tabs =====
+function switchDetailTab(el, panelId) {
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('[id^="detail-panel-"]').forEach(p => p.style.display = 'none');
+  document.getElementById(panelId).style.display = 'block';
+}
+
+// ===== Message Tabs =====
+function switchMsgTab(el) {
+  document.querySelectorAll('.msg-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== Draft Auto-Save =====
+const DRAFT_KEY = 'walmart_register_draft';
+let selectedSite = null;
+const SITE_NAMES = { us:'美国站', ca:'加拿大站', mx:'墨西哥站' };
+
+// Form definitions per site
+const SITE_FORMS = {
+  us: {
+    title: '沃尔玛全球电商美国站开店登记表',
+    steps: [
+      { name:'联系人信息', fields:[
+        { key:'contactName', label:'首要联系人姓名', required:true, placeholder:'负责签署合同的管理员姓名' },
+        { key:'phone', label:'首要联系人手机', required:true, placeholder:'11位手机号码', prefix:'+86' },
+        { key:'email', label:'首要联系人邮箱', required:true, placeholder:'将作为店铺账号绑定邮箱' },
+      ]},
+      { name:'企业信息', fields:[
+        { key:'companyName', label:'公司名（中文）', required:true, placeholder:'营业执照上完整的公司名称' },
+        { key:'regLocation', label:'公司注册地', required:true, type:'select', placeholder:'请选择', options:['中国大陆','中国香港'] },
+        { key:'brand', label:'公司拥有的品牌名称', required:true, placeholder:'多个用"/"隔开，无品牌填"No"' },
+      ]},
+      { name:'经营信息', fields:[
+        { key:'category', label:'申请开店的主要类目', required:true, type:'select', placeholder:'请选择', options:['电子产品','服装','家居','美妆','食品','玩具','运动户外','汽车配件','其他'] },
+        { key:'subCategory', label:'细分产品品类（英文）', required:false, placeholder:'请填写英文名称' },
+        { key:'annualSales', label:'企业单跨境店铺年销售额', required:true, type:'select', placeholder:'请选择', options:['100万以下','100-500万','500-1000万','1000-5000万','5000万以上'] },
+        { key:'otherPlatforms', label:'入驻的其他跨境电商平台名称', required:true, placeholder:'如：Amazon, eBay, Shopee' },
+        { key:'storeLink', label:'其他跨境电商平台的店铺链接', required:true, placeholder:'请输入店铺URL' },
+        { key:'sellerId', label:'其他跨境电商平台的卖家ID', required:true, placeholder:'请输入卖家ID' },
+        { key:'accountManager', label:'对接的客户拓展经理姓名', required:false, placeholder:'如有，请填写英文全名(如John Zhang)' },
+        { key:'logistics', label:'是否需要物流方面的支持', required:true, type:'select', placeholder:'请选择', options:['是，需要WFS仓配','是，需要头程物流','是，需要全部','暂时不需要'] },
+      ]},
+      { name:'确认提交', fields:[] }
+    ]
+  },
+  ca: {
+    title: '沃尔玛全球电商加拿大站入驻登记表',
+    steps: [
+      { name:'联系人信息', fields:[
+        { key:'contactName', label:'首要联系人姓名', required:true, placeholder:'负责签署合同的管理员姓名' },
+        { key:'phone', label:'首要联系人手机', required:true, placeholder:'11位手机号码', prefix:'+86' },
+        { key:'email', label:'首要联系人邮箱', required:true, placeholder:'将作为店铺账号绑定邮箱' },
+      ]},
+      { name:'企业信息', fields:[
+        { key:'companyName', label:'公司名（中文）', required:true, placeholder:'营业执照上完整的公司名称' },
+        { key:'regLocation', label:'公司注册地', required:true, type:'select', placeholder:'请选择', options:['中国大陆','中国香港'] },
+        { key:'brand', label:'公司拥有的品牌名称', required:true, placeholder:'多个用"/"隔开，无品牌填"No"' },
+      ]},
+      { name:'经营信息', fields:[
+        { key:'category', label:'申请开店的主要类目', required:true, type:'select', placeholder:'请选择', options:['电子产品','服装','家居','美妆','食品','玩具','运动户外','汽车配件','其他'] },
+        { key:'hasUSStore', label:'是否已入驻沃尔玛美国站', required:true, type:'select', placeholder:'请选择', options:['是，已激活90天以上','是，但未满90天','否'] },
+      ]},
+      { name:'确认提交', fields:[] }
+    ]
+  },
+  mx: {
+    title: '沃尔玛全球电商墨西哥站入驻登记表',
+    steps: [
+      { name:'联系人信息', fields:[
+        { key:'contactName', label:'首要联系人姓名', required:true, placeholder:'负责签署合同的管理员姓名' },
+        { key:'phone', label:'首要联系人手机', required:true, placeholder:'11位手机号码', prefix:'+86' },
+        { key:'email', label:'首要联系人邮箱', required:true, placeholder:'将作为店铺账号绑定邮箱' },
+      ]},
+      { name:'企业信息', fields:[
+        { key:'companyName', label:'公司名（中文）', required:true, placeholder:'营业执照上完整的公司名称' },
+        { key:'regLocation', label:'公司注册地', required:true, type:'select', placeholder:'请选择', options:['中国大陆','中国香港'] },
+        { key:'brand', label:'公司拥有的品牌名称', required:true, placeholder:'多个用"/"隔开，无品牌填"No"' },
+      ]},
+      { name:'经营信息', fields:[
+        { key:'category', label:'申请开店的主要类目', required:true, type:'select', placeholder:'请选择', options:['电子产品','服装','家居','美妆','食品','玩具','运动户外','汽车配件','其他'] },
+        { key:'hasUSStore', label:'是否已入驻沃尔玛美国站', required:true, type:'select', placeholder:'请选择', options:['是','否'] },
+        { key:'mxExperience', label:'是否具有墨西哥主流跨境电商平台经验', required:true, type:'select', placeholder:'请选择', options:['是(MercadoLibre等)','否'] },
+        { key:'rfcTax', label:'是否具有与公司主体一致的墨西哥RFC税号', required:true, type:'select', placeholder:'请选择', options:['是','否','申请中'] },
+      ]},
+      { name:'确认提交', fields:[] }
+    ]
+  }
+};
+
+function renderFormForSite(site) {
+  const config = SITE_FORMS[site];
+  const container = document.getElementById('registerForms');
+  let html = '';
+  config.steps.forEach((step, i) => {
+    const isActive = i === 0;
+    const display = isActive ? 'block' : 'none';
+    html += `<div class="form-section register-step${isActive?' active':''}" data-step="${i+1}" style="display:${display};">`;
+    if (i < config.steps.length - 1) {
+      html += `<div class="form-title">${step.name}</div>`;
+      step.fields.forEach(f => {
+        const req = f.required ? ' *' : '';
+        if (f.type === 'select') {
+          html += `<div class="form-group"><label class="form-label">${f.label}${req}</label><select class="form-input" data-key="${f.key}"><option value="" disabled selected>${f.placeholder}</option>`;
+          f.options.forEach(opt => { html += `<option value="${opt}">${opt}</option>`; });
+          html += `</select></div>`;
+        } else {
+          const prefixHtml = f.prefix ? `<span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-sec);font-size:13px;">${f.prefix}</span>` : '';
+          const padLeft = f.prefix ? 'padding-left:46px;' : '';
+          html += `<div class="form-group"><label class="form-label">${f.label}${req}</label><div style="position:relative;">${prefixHtml}<input class="form-input" data-key="${f.key}" placeholder="${f.placeholder}" style="${padLeft}"></div></div>`;
+        }
+      });
+    } else {
+      // Confirmation step
+      html += `<div class="form-title">确认提交</div>`;
+      html += `<p style="font-size:13px;color:var(--text-sec);line-height:1.8;padding:12px 0;">`;
+      html += `请确认以上信息填写无误。提交后，沃尔玛将核实您填写的信息。<br><br>`;
+      html += `<strong>审核周期：</strong>通常 3-5 个工作日<br>`;
+      html += `<strong>结果通知：</strong>通过短信和邮箱通知<br><br>`;
+      html += `<label style="display:flex;align-items:flex-start;gap:6px;cursor:pointer;"><input type="checkbox" style="margin-top:3px;"><span style="font-size:12px;">我已阅读并同意《沃尔玛电商卖家隐私政策》和《入驻登记表用户协议》及《个人信息出境条款》</span></label>`;
+      html += `</p>`;
+    }
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+
+  // Update steps bar
+  const stepsBar = document.getElementById('stepsBar');
+  let stepsHtml = '';
+  config.steps.forEach((step, i) => {
+    const cls = i === 0 ? 'active' : '';
+    const line = i < config.steps.length - 1 ? '<div class="step-line"></div>' : '';
+    stepsHtml += `<div class="step-item ${cls}"><div class="step-circle">${i+1}</div><div class="step-label">${step.name}</div>${line}</div>`;
+  });
+  stepsBar.innerHTML = stepsHtml;
+
+  // Reset step
+  regStep = 1;
+  updateStepUI();
+}
+
+function selectSite(site) {
+  selectedSite = site;
+  document.getElementById('siteSelectPanel').style.display = 'none';
+  document.getElementById('registerFormArea').style.display = 'block';
+  // Update nav title
+  const navBar = document.querySelector('#page-register .nav-bar');
+  navBar.innerHTML = '<span class="back-btn" onclick="backToSiteSelect()">←</span>入驻申请 · ' + SITE_NAMES[site];
+  // Render form
+  renderFormForSite(site);
+  // Init draft
+  initDraftListeners();
+  updateSmartFillVisibility();
+}
+
+function backToSiteSelect() {
+  document.getElementById('siteSelectPanel').style.display = 'block';
+  document.getElementById('registerFormArea').style.display = 'none';
+  const navBar = document.querySelector('#page-register .nav-bar');
+  navBar.innerHTML = '<span class="back-btn" onclick="goBack()">←</span>入驻申请';
+  selectedSite = null;
+  document.getElementById('smartFillBtn').classList.remove('show');
+}
+
+let draftTimer = null;
+
+function getAllFormData() {
+  const data = { _site: selectedSite, _step: regStep, _time: Date.now() };
+  document.querySelectorAll('#registerForms [data-key]').forEach(el => {
+    data[el.dataset.key] = el.value || '';
+  });
+  return data;
+}
+
+function saveDraft() {
+  const data = getAllFormData();
+  const hasContent = Object.keys(data).some(k => !k.startsWith('_') && data[k] && data[k].trim());
+  if (!hasContent) return;
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+  showDraftStatus('saved');
+}
+
+function showDraftStatus(state) {
+  const bar = document.getElementById('draftBar');
+  const text = document.getElementById('draftStatusText');
+  const time = document.getElementById('draftTime');
+  bar.style.display = 'flex';
+  bar.className = 'draft-bar ' + state;
+  if (state === 'saved') {
+    text.textContent = '草稿已保存';
+    time.textContent = new Date().toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+  } else if (state === 'saving') {
+    text.textContent = '保存中...';
+    time.textContent = '';
+  }
+}
+
+function restoreDraft() {
+  const raw = localStorage.getItem(DRAFT_KEY);
+  if (!raw) return false;
+  try {
+    const data = JSON.parse(raw);
+    // Only restore if same site
+    if (data._site && data._site !== selectedSite) return false;
+    // Fill fields by data-key
+    Object.keys(data).forEach(key => {
+      if (key.startsWith('_')) return;
+      const el = document.querySelector(`#registerForms [data-key="${key}"]`);
+      if (el && data[key]) el.value = data[key];
+    });
+    // Restore step
+    if (data._step && data._step > 1) {
+      const totalSteps = SITE_FORMS[selectedSite]?.steps.length || 4;
+      if (data._step <= totalSteps) {
+        for (let i = 1; i <= totalSteps; i++) {
+          const sec = document.querySelector(`.register-step[data-step="${i}"]`);
+          if (sec) sec.style.display = i === data._step ? 'block' : 'none';
+        }
+        regStep = data._step;
+        updateStepUI();
+      }
+    }
+    showDraftStatus('saved');
+    if (data._time) {
+      document.getElementById('draftTime').textContent = '上次 ' + new Date(data._time).toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit' });
+    }
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+  document.getElementById('draftBar').style.display = 'none';
+  showToast('草稿已清除');
+}
+
+function scheduleDraftSave() {
+  clearTimeout(draftTimer);
+  showDraftStatus('saving');
+  draftTimer = setTimeout(saveDraft, 800);
+}
+
+function initDraftListeners() {
+  const form = document.getElementById('registerForms');
+  if (!form) return;
+  form.addEventListener('input', scheduleDraftSave);
+  // Restore on init
+  restoreDraft();
+}
+
+// ===== Smart Fill =====
+function openSmartFill() {
+  document.getElementById('sfOverlay').classList.add('show');
+  document.getElementById('sfTextarea').value = '';
+  document.getElementById('sfResult').classList.remove('show');
+}
+
+function closeSmartFill(e) {
+  if (e && e.target !== document.getElementById('sfOverlay')) return;
+  document.getElementById('sfOverlay').classList.remove('show');
+}
+
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('sfTextarea').value = text;
+    showToast('已粘贴');
+  } catch(e) {
+    showToast('请手动粘贴（需授权剪贴板）');
+    document.getElementById('sfTextarea').focus();
+  }
+}
+
+function doSmartFill() {
+  const text = document.getElementById('sfTextarea').value.trim();
+  if (!text) { showToast('请先粘贴或输入文本'); return; }
+
+  const filled = [];
+  const patterns = [
+    { key:'companyName', label:'公司名', regs:[/(?:企业名称|公司名称|名\s*称)[：:\s]*(.+)/i, /([^\s,，;；]+(?:有限公司|有限责任公司|股份有限公司|集团))/] },
+    { key:'regLocation', label:'公司注册地', regs:[/(?:注册地|注册地区)[：:\s]*(中国(?:大陆|香港))/i] },
+    { key:'brand', label:'品牌名称', regs:[/(?:品牌名称|主营品牌|品\s*牌)[：:\s]*(.+)/i] },
+    { key:'category', label:'主营类目', regs:[/(?:主营类目|经营范围|主营业务|类\s*目)[：:\s]*(.+)/i] },
+    { key:'subCategory', label:'细分品类', regs:[/(?:细分品类|细分类目|子类目)[：:\s]*(.+)/i] },
+    { key:'annualSales', label:'年销售额', regs:[/(?:年销售额|年营收|销售额)[：:\s]*([\d,.]+)/i] },
+    { key:'contactName', label:'联系人', regs:[/(?:联系人|负责人|对接人|姓名)[：:\s]*([\u4e00-\u9fa5]{2,4})/i] },
+    { key:'phone', label:'手机号', regs:[/(?:手机|电话|联系电话|手机号)[：:\s]*(1[3-9]\d{9})/i, /\b(1[3-9]\d{9})\b/] },
+    { key:'email', label:'邮箱', regs:[/(?:邮箱|邮件|Email)[：:\s]*([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/i, /([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/] },
+    { key:'otherPlatforms', label:'其他平台', regs:[/(?:其他平台|电商平台|平台名称)[：:\s]*(.+)/i] },
+    { key:'storeLink', label:'店铺链接', regs:[/(?:店铺链接|店铺地址|店铺URL)[：:\s]*(https?:\/\/.+)/i] },
+    { key:'sellerId', label:'卖家ID', regs:[/(?:卖家ID|Seller\s*ID|店铺ID)[：:\s]*(\S+)/i] },
+    { key:'accountManager', label:'客户经理', regs:[/(?:客户经理|拓展经理|KA)[：:\s]*(\S+)/i] },
+  ];
+
+  patterns.forEach(p => {
+    for (const re of p.regs) {
+      const m = text.match(re);
+      if (m && m[1]) {
+        const val = m[1].trim().replace(/[,，。.;；\s]+$/, '');
+        const el = document.querySelector(`#registerForms [data-key="${p.key}"]`);
+        if (el) {
+          el.value = val;
+          filled.push(p.label + '：' + val);
+        }
+        return;
+      }
+    }
+  });
+
+  const resultEl = document.getElementById('sfResult');
+  if (filled.length > 0) {
+    resultEl.innerHTML = `<div style="font-weight:500;margin-bottom:4px;">已识别 ${filled.length} 个字段：</div>` +
+      filled.map(f => `<div class="sf-result__item">${f}</div>`).join('');
+    resultEl.classList.add('show');
+    resultEl.style.background = '#F0FDF4';
+    saveDraft();
+    showToast(`已填充 ${filled.length} 个字段`);
+  } else {
+    resultEl.innerHTML = '<div style="color:#92400E;">未识别到匹配字段，请检查文本格式后重试。</div>';
+    resultEl.classList.add('show');
+    resultEl.style.background = '#FEF3C7';
+  }
+}
+
+// Show/hide smart fill button based on current page
+function updateSmartFillVisibility() {
+  const btn = document.getElementById('smartFillBtn');
+  const regPage = document.getElementById('page-register');
+  if (regPage && regPage.classList.contains('active')) {
+    btn.classList.add('show');
+  } else {
+    btn.classList.remove('show');
+  }
+}
+
+function closeManagerModal() { document.getElementById('managerModal').classList.remove('show'); }
+function openManagerModal() { document.getElementById('managerModal').classList.add('show'); }
+
+// ===== Activity Registration =====
+function openRegModal() {
+  document.querySelectorAll('.reg-modal__step').forEach(s => s.classList.remove('active'));
+  document.getElementById('regStep1').classList.add('active');
+  document.getElementById('regModal').classList.add('show');
+}
+function closeRegModal() { document.getElementById('regModal').classList.remove('show'); }
+function regNextStep(step) {
+  document.querySelectorAll('.reg-modal__step').forEach(s => s.classList.remove('active'));
+  document.getElementById('regStep' + step).classList.add('active');
+}
+function submitRegForm() {
+  const name = document.getElementById('regFormName').value.trim();
+  const company = document.getElementById('regFormCompany').value.trim();
+  const phone = document.getElementById('regFormPhone').value.trim();
+  const email = document.getElementById('regFormEmail').value.trim();
+  const role = document.getElementById('regFormRole').value;
+  if (!name || !company || !phone || !email || !role) { showToast('请填写所有必填项'); return; }
+  if (!/^1[3-9]\d{9}$/.test(phone)) { showToast('请输入正确的手机号'); return; }
+  localStorage.setItem('activity_registered', 'true');
+  regNextStep(3);
+  updateActivityActionBtn();
+}
+
+function handleActivityAction() {
+  if (localStorage.getItem('activity_registered') === 'true') {
+    navigateTo('page-checkin');
+  } else {
+    openRegModal();
+  }
+}
+
+function updateActivityActionBtn() {
+  const btn = document.getElementById('activityActionBtn');
+  if (!btn) return;
+  if (localStorage.getItem('activity_registered') === 'true') {
+    btn.textContent = '扫码签到';
+  } else {
+    btn.textContent = '立即报名';
+  }
+}
+
+// ===== Share =====
+function openShareSheet() { document.getElementById('shareSheet').classList.add('show'); }
+function closeShareSheet(e) {
+  if (e && e.target !== document.getElementById('shareSheet')) return;
+  document.getElementById('shareSheet').classList.remove('show');
+}
+function shareAction(type) {
+  closeShareSheet();
+  if (type === '复制链接') showToast('活动链接已复制到剪贴板');
+  else if (type === '生成海报') showToast('海报生成中...');
+  else showToast('正在打开' + type + '...');
+}
+
+// ===== Punch Card =====
+function doPunch(id, name) {
+  const el = document.getElementById(id);
+  if (el.classList.contains('done')) return;
+  el.classList.add('done');
+  el.querySelector('.punch-point__btn').textContent = '已打卡';
+  showToast(name + ' 打卡成功！+5 经验值');
+}
+
+// ===== Checkin Scanner =====
+function simulateCheckin() {
+  showToast('识别中...');
+  setTimeout(() => {
+    document.getElementById('checkinScanner').style.display = 'none';
+    document.getElementById('checkinSuccess').style.display = 'block';
+  }, 1500);
+}
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  renderCalendar();
+  initDraftListeners();
+});
+</script>
+</div>
+</body>
+</html>
