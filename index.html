@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>沃尔玛卖家中心</title>
+<title>Walmart卖家服务中心</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root { --primary: #1A56DB; --primary-light: #E1EFFE; --bg: #F3F4F6; --white: #FFFFFF; --text: #1F2937; --text-sec: #6B7280; --text-third: #9CA3AF; --border: #E5E7EB; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; }
@@ -531,6 +531,25 @@ html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe
 .scanner-area svg { width:64px; height:64px; stroke:rgba(255,255,255,.5); fill:none; stroke-width:1; }
 .scanner-corners { position:absolute; inset:12px; border:2px solid rgba(255,255,255,.3); border-radius:8px; }
 
+.notice-bar { display:flex; align-items:center; gap:8px; padding:9px 14px; background:linear-gradient(135deg,#FFFBEB,#FEF3C7); margin:0; cursor:pointer; }
+.notice-bar__icon { flex-shrink:0; display:flex; }
+.notice-bar__icon svg { width:16px; height:16px; stroke:#D97706; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+.notice-bar__label { flex-shrink:0; font-size:11px; font-weight:600; color:#92400E; background:rgba(217,119,6,.15); padding:1px 6px; border-radius:3px; }
+.notice-bar__track { flex:1; overflow:hidden; height:18px; position:relative; }
+.notice-bar__text { font-size:12px; color:#92400E; white-space:nowrap; position:absolute; line-height:18px; animation:noticeScroll 12s linear infinite; }
+@keyframes noticeScroll { 0%{transform:translateX(100%);} 100%{transform:translateX(-100%);} }
+.notice-bar__arrow { flex-shrink:0; font-size:16px; color:#D97706; }
+.notice-list-item { padding:12px 0; border-bottom:1px solid var(--border); }
+.notice-list-item:last-child { border-bottom:none; }
+.notice-list-item__top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.notice-list-item__badge { font-size:10px; font-weight:600; padding:1px 7px; border-radius:3px; }
+.notice-list-item__badge.red { background:#FEE2E2; color:#DC2626; }
+.notice-list-item__badge.amber { background:#FEF3C7; color:#D97706; }
+.notice-list-item__badge.blue { background:#DBEAFE; color:#2563EB; }
+.notice-list-item__time { font-size:11px; color:var(--text-third); }
+.notice-list-item__title { font-size:13px; font-weight:600; margin-bottom:4px; color:var(--text); }
+.notice-list-item__desc { font-size:12px; color:var(--text-sec); line-height:1.5; }
+
 /* Inline content icons */
 .ic { display:inline-flex; width:14px; height:14px; vertical-align:-2px; margin-right:3px; }
 .ic svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
@@ -545,7 +564,13 @@ html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe
 
 <!-- ========== PAGE 1: 首页 (Tab1) ========== -->
 <div class="page active" id="page-home">
-  <div class="nav-bar">沃尔玛卖家中心</div>
+  <div class="nav-bar">Walmart卖家服务中心</div>
+  <div class="notice-bar" onclick="openNoticeModal()">
+    <span class="notice-bar__icon"><svg viewBox="0 0 24 24"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg></span>
+    <span class="notice-bar__label">公告</span>
+    <div class="notice-bar__track"><div class="notice-bar__text" id="noticeText">2026年Q3招商政策已更新，新卖家最高享75,000美元优惠</div></div>
+    <span class="notice-bar__arrow">›</span>
+  </div>
   <div class="banner-wrap">
     <div class="banner-track" id="bannerTrack">
       <div class="banner-slide" onclick="navigateTo('page-activity-detail')"><img src="assets/banner1.jpg" alt="banner1"></div>
@@ -1406,6 +1431,32 @@ html, body { height:100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe
   </div>
 </div>
 
+<!-- Notice Modal -->
+<div class="reg-modal" id="noticeModal">
+  <div class="reg-modal__box" style="text-align:left;max-width:340px;">
+    <button class="reg-modal__close" onclick="closeNoticeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="reg-modal__title" style="text-align:center;">系统公告</div>
+    <div style="max-height:60vh;overflow-y:auto;margin-top:8px;">
+      <div class="notice-list-item">
+        <div class="notice-list-item__top"><span class="notice-list-item__badge red">重要</span><span class="notice-list-item__time">07-24</span></div>
+        <div class="notice-list-item__title">2026年Q3招商政策更新</div>
+        <div class="notice-list-item__desc">新卖家入驻最高可享75,000美元优惠，佣金减免政策同步升级，详情咨询您的专属客户经理。</div>
+      </div>
+      <div class="notice-list-item">
+        <div class="notice-list-item__top"><span class="notice-list-item__badge amber">活动</span><span class="notice-list-item__time">07-22</span></div>
+        <div class="notice-list-item__title">2026沃尔玛卖家峰会开放报名</div>
+        <div class="notice-list-item__desc">7月20日上海浦东香格里拉，现场对接招商经理，名额有限，报名从速。</div>
+      </div>
+      <div class="notice-list-item">
+        <div class="notice-list-item__top"><span class="notice-list-item__badge blue">系统</span><span class="notice-list-item__time">07-18</span></div>
+        <div class="notice-list-item__title">卖家后台功能升级通知</div>
+        <div class="notice-list-item__desc">WFS物流仓配面板全新改版，新增库存预警与补货建议功能，欢迎体验。</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="closeNoticeModal()">我知道了</button>
+  </div>
+</div>
+
 <!-- Manager Modal -->
 <div class="reg-modal" id="managerModal">
   <div class="reg-modal__box">
@@ -2122,6 +2173,8 @@ function updateSmartFillVisibility() {
 
 function closeManagerModal() { document.getElementById('managerModal').classList.remove('show'); }
 function openManagerModal() { document.getElementById('managerModal').classList.add('show'); }
+function openNoticeModal() { document.getElementById('noticeModal').classList.add('show'); }
+function closeNoticeModal() { document.getElementById('noticeModal').classList.remove('show'); }
 
 // ===== Activity Registration =====
 function openRegModal() {
